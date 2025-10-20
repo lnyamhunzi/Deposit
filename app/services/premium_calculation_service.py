@@ -5,9 +5,14 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime, timedelta
 from decimal import Decimal
 import uuid
-from app.models.premiums import PremiumCalculation, PremiumStatus, CalculationMethod
-from app.models.returns import ReturnPeriod, Institution
-from app.models.surveillance import DepositAnalysis
+from models import (
+    PremiumCalculation,
+    PremiumStatus,
+    CalculationMethod,
+    ReturnPeriod,
+    Institution,
+    DepositAnalysis,
+)
 from app.services.risk_scoring import RiskScoringModel
 from app.schemas.premiums import PremiumCalculationRequest, PremiumCalculationResponse
 

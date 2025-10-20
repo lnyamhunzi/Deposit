@@ -3,8 +3,7 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime, timedelta
 from decimal import Decimal
 import uuid
-from app.models.premiums import Invoice, PremiumCalculation, PremiumStatus, Payment, PremiumPenalty
-from app.models.returns import Institution, ReturnPeriod
+from models import Invoice, PremiumCalculation, PremiumStatus, Payment, PremiumPenalty, Institution, ReturnPeriod
 from app.schemas.premiums import InvoiceResponse, PaymentResponse, PenaltyResponse
 
 class InvoicingService:

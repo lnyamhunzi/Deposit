@@ -4,11 +4,10 @@ from sqlalchemy.orm import Session
 from typing import Dict, List, Any, Optional
 from datetime import datetime, timedelta
 from decimal import Decimal
-from app.models.surveillance import SurveillancePeriod, DepositAnalysis, ExposureCalculation, CAMELSRating
-from app.models.returns import Institution
+from models import SurveillancePeriod, DepositAnalysis, SurveillanceExposureCalculation as ExposureCalculation, CAMELSRating, Institution, RiskScore, EarlyWarningSignal
 from app.services.deposit_analysis_service import DepositAnalysisService
 from app.services.exposure_calculation_service import ExposureCalculationService
-from app.services.camels_calculations import CAMELSCalculations
+from camels_calculations import CAMELSCalculations
 from app.services.risk_scoring import RiskScoringModel
 
 class ExecutiveDashboardService:

@@ -2042,5 +2042,7 @@ from penalty_engine import PenaltyEngine
 
 
 if __name__ == '__main__':
-    init_database()
-    app.run(host='0.0.0.0', port=8400, debug=True)
+    # Run the FastAPI app with uvicorn when executed directly
+    import uvicorn
+    port = int(os.getenv("PORT", "8400"))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)

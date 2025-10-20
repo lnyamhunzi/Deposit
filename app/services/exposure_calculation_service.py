@@ -5,9 +5,8 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime
 from decimal import Decimal
 import uuid
-from app.models.surveillance import ExposureCalculation, SurveillancePeriod, DepositType
+from models import SurveillanceExposureCalculation as ExposureCalculation, SurveillancePeriod, DepositType, ReturnUpload, ReturnPeriod, Institution
 from app.services.deposit_analysis_service import DepositAnalysisService
-from app.models.returns import ReturnUpload, ReturnPeriod, Institution
 
 class ExposureCalculationService:
     def __init__(self, db: Session):
