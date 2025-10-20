@@ -7,7 +7,16 @@ from sqlalchemy.orm import Session
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
 import uuid
-from models import ReturnUpload, ReturnPeriod, ValidationResult, Penalty, Institution
+from models import (
+    ReturnUpload,
+    ReturnPeriod,
+    ValidationResult,
+    Penalty,
+    Institution,
+    ReturnStatus,
+    FileType,
+    ValidationStatus,
+)
 from app.schemas.returns import ReturnUploadResponse, ValidationResultResponse
 
 class ReturnsUploadService:
@@ -16,7 +25,7 @@ class ReturnsUploadService:
         self.upload_base_dir = upload_base_dir
         os.makedirs(upload_base_dir, exist_ok=True)
 
-    async def upload_return_file(self, period_id: str, file_type: str, file: UploadFile, uploaded_by: str) -> ReturnUploadResponse:
+    async def upload_return_file(self, period_id: str, file_type: str | FileType, file: UploadFile, uploaded_by: str) -> ReturnUploadResponse:
         # Validate period and institution
         period = self.db.query(ReturnPeriod).filter(ReturnPeriod.id == period_id).first()
         if not period:
@@ -31,18 +40,32 @@ class ReturnsUploadService:
         file_hash = self._calculate_file_hash(file_location)
         file_size = os.path.getsize(file_location)
 
+        # Normalize file type to FileType enum
+        file_type_enum: FileType
+        if isinstance(file_type, FileType):
+            file_type_enum = file_type
+        else:
+            try:
+                # allow common synonyms
+                normalized = file_type.strip().upper()
+                if normalized in {"DEPOSITS", "DEPOSIT_RETURN", "DEPOSITS_RETURN"}:
+                    normalized = "DEPOSIT"
+                file_type_enum = FileType[normalized]
+            except Exception:
+                file_type_enum = FileType.DEPOSIT
+
         # Create ReturnUpload record
         new_upload = ReturnUpload(
             id=str(uuid.uuid4()),
             period_id=period_id,
             file_name=file.filename,
-            file_type=file_type,
+            file_type=file_type_enum,
             file_path=file_location,
             file_size=file_size,
             file_hash=file_hash,
             uploaded_by=uploaded_by,
             uploaded_at=datetime.utcnow(),
-            upload_status="UPLOADED"
+            upload_status=ReturnStatus.UPLOADED
         )
         self.db.add(new_upload)
         self.db.commit()
@@ -109,12 +132,12 @@ class ReturnsUploadService:
             raise HTTPException(status_code=404, detail="Return Upload not found")
 
         # Check validation results
-        failed_validations = [res for res in upload.validation_results if res.status == "FAIL"]
+        failed_validations = [res for res in upload.validation_results if res.status == ValidationStatus.FAIL]
         if failed_validations and not force_submit:
             raise HTTPException(status_code=400, detail="Cannot submit: validation failures detected. Use force_submit to override.")
 
         # Update status and submitted_at timestamp
-        upload.upload_status = "SUBMITTED"
+        upload.upload_status = ReturnStatus.SUBMITTED
         upload.submitted_at = datetime.utcnow()
         self.db.commit()
         self.db.refresh(upload)

@@ -3,8 +3,7 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime, timedelta
 from decimal import Decimal
 import uuid
-from app.models.premiums import PremiumPenalty, Invoice, Payment, PremiumStatus
-from app.models.returns import Institution
+from models import PremiumPenalty, Invoice, Payment, PremiumStatus, Institution
 
 class PenaltyLevyingService:
     def __init__(self, db: Session):

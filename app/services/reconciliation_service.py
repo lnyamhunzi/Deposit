@@ -108,7 +108,7 @@ class ReconciliationService:
             })
         
         # Check 2: Unverified payments
-        unverified_payments = [p for p in payments if p.status == "PENDING"]
+        unverified_payments = [p for p in payments if p.status == PaymentStatus.PENDING]
         if unverified_payments:
             discrepancies.append({
                 "type": "UNVERIFIED_PAYMENTS",

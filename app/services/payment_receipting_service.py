@@ -28,9 +28,6 @@ class PaymentReceiptingService:
         with open(file_location, "wb") as file_object:
             shutil.copyfileobj(receipt_file.file, file_object)
         
-        # Calculate file hash for integrity
-        file_hash = self._calculate_file_hash(file_location)
-
         # Create payment record
         payment = Payment(
             id=str(uuid.uuid4()),
@@ -41,8 +38,7 @@ class PaymentReceiptingService:
             payment_method=request.payment_method,
             payment_reference=request.payment_reference,
             bank_reference=request.bank_reference,
-            receipt_path=file_location,
-            receipt_hash=file_hash,
+            proof_document_path=file_location,
             status=PaymentStatus.PENDING
         )
         self.db.add(payment)

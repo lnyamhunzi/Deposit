@@ -5,7 +5,16 @@ from sqlalchemy.orm import Session
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
 import uuid
-from models import ReturnUpload, ReturnPeriod, ValidationResult, Penalty, Institution
+from models import (
+    ReturnUpload,
+    ReturnPeriod,
+    ValidationResult,
+    Penalty,
+    Institution,
+    ReturnStatus,
+    FileType,
+    ValidationStatus,
+)
 from app.schemas.returns import ReturnUploadResponse, ValidationResultResponse
 
 class ReturnsStorageService:
@@ -18,7 +27,7 @@ class ReturnsStorageService:
         """Archive submitted returns for long-term storage"""
         
         upload = self.db.query(ReturnUpload).filter(ReturnUpload.id == upload_id).first()
-        if not upload or upload.upload_status != "SUBMITTED":
+        if not upload or upload.upload_status != ReturnStatus.SUBMITTED:
             return {"error": "Upload not found or not submitted"}
         
         try:
@@ -107,9 +116,9 @@ class ReturnsStorageService:
             },
             "validation_summary": {
                 "total_tests": len(validation_results),
-                "passed_tests": len([r for r in validation_results if r.status == "PASS"]),
-                "failed_tests": len([r for r in validation_results if r.status == "FAIL"]),
-                "warning_tests": len([r for r in validation_results if r.status == "WARNING"])
+                "passed_tests": len([r for r in validation_results if r.status == ValidationStatus.PASS]),
+                "failed_tests": len([r for r in validation_results if r.status == ValidationStatus.FAIL]),
+                "warning_tests": len([r for r in validation_results if r.status == ValidationStatus.WARNING])
             },
             "archive_info": {
                 "archived_at": datetime.utcnow().isoformat(),
@@ -122,9 +131,14 @@ class ReturnsStorageService:
                                        file_type: str) -> Dict[str, Any]:
         """Retrieve historical return for analysis"""
         
+        # Normalize file type to FileType
+        try:
+            file_type_enum = FileType[file_type] if isinstance(file_type, str) else file_type
+        except Exception:
+            file_type_enum = FileType.DEPOSIT
         upload = self.db.query(ReturnUpload).filter(
             ReturnUpload.period_id == period_id,
-            ReturnUpload.file_type == file_type
+            ReturnUpload.file_type == file_type_enum
         ).first()
         
         if not upload:
@@ -246,9 +260,9 @@ class ReturnsStorageService:
         if not results:
             return "NOT_VALIDATED"
         
-        if any(result.status == "FAIL" for result in results):
+        if any(result.status == ValidationStatus.FAIL for result in results):
             return "FAILED"
-        elif any(result.status == "WARNING" for result in results):
+        elif any(result.status == ValidationStatus.WARNING for result in results):
             return "WARNING"
         else:
             return "PASSED"
