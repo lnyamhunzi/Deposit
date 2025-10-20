@@ -12,7 +12,8 @@ class CustomMiddleware(BaseHTTPMiddleware):
             db = SessionLocal()
             institution = db.query(Institution).filter_by(id=request.query_params.get('bank_id')).first()
             db.close()
-            if institution and institution.status == 'Locked' and request.url.path not in ['/locked', '/static']:
+            # Normalize status comparisons to uppercase to match models default "ACTIVE"
+            if institution and str(institution.status).upper() == 'LOCKED' and request.url.path not in ['/locked', '/static']:
                 return RedirectResponse(url='/locked')
 
         # Log user activity

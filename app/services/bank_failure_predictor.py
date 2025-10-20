@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
@@ -20,13 +21,15 @@ class BankFailurePredictor:
     def __init__(self, db: Session):
         self.db = db
         self.models = {}
-        self.scaler = None # Will be loaded
+        self.scaler = StandardScaler()
         self.feature_selector = None # Will be loaded
         self.best_model = None # Will be loaded
         self.model_path = "ml_models/failure_model.pkl"
         self.scaler_path = "ml_models/scaler.pkl"
         self.feature_selector_path = "ml_models/feature_selector.pkl" # Assuming a separate file for feature selector
         self._load_models()
+        # Ensure model registry is initialized for training when no pre-trained model exists
+        self._initialize_models()
 
     def _load_models(self):
         """Load pre-trained ML models and scaler"""

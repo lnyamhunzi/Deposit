@@ -5,9 +5,25 @@ import os
 from decimal import Decimal
 import json
 
-DATABASE_URL = 'mysql+mysqlconnector://root:Mugonat#99@localhost/deposits'
+# Prefer DATABASE_URL from environment; fall back to local SQLite for development
+def _resolve_database_url() -> str:
+    env_url = os.getenv("DATABASE_URL")
+    if env_url and env_url.strip():
+        return env_url
 
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+    # Default: file-based SQLite in ./data/app.db
+    data_dir = os.getenv("DATA_DIR", os.path.join(os.getcwd(), "data"))
+    try:
+        os.makedirs(data_dir, exist_ok=True)
+    except Exception:
+        # If directory creation fails, fallback to current working directory
+        data_dir = os.getcwd()
+    return f"sqlite:///{os.path.join(data_dir, 'app.db')}"
+
+DATABASE_URL = _resolve_database_url()
+
+_connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+engine = create_engine(DATABASE_URL, pool_pre_ping=True, connect_args=_connect_args)
 SessionLocal = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
 
@@ -25,8 +41,8 @@ def create_default_admin_user():
     
     session = SessionLocal()
     try:
-        admin_email = "admin@mugonat.com"
-        admin_password = "Mugonat#99"
+        admin_email = os.getenv("DEFAULT_ADMIN_EMAIL", "admin@example.com")
+        admin_password = os.getenv("DEFAULT_ADMIN_PASSWORD", "admin")
         
         existing_user = session.query(User).filter_by(email=admin_email).first()
         

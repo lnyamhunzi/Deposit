@@ -12,6 +12,7 @@ from models import Base, User, pwd_context, Institution, CAMELSRating, RiskScore
     AccountStatus, DepositType, AccountSize, PremiumStatus, PaymentStatus, CalculationMethod, ReturnUpload, CustomerAccount
 from typing import Generator, Optional, Dict
 import os
+import uvicorn
 from pydantic import BaseModel
 from fastapi.security import OAuth2PasswordBearer
 from starlette.middleware.sessions import SessionMiddleware
@@ -280,7 +281,7 @@ def serialize_sqla_object(obj, attributes):
 async def dashboard(request: Request, current_user: User = Depends(get_current_user)):
     db = SessionLocal()
     try:
-        total_banks = db.query(Institution).filter_by(status='Active').count()
+        total_banks = db.query(Institution).filter_by(status='ACTIVE').count()
         total_returns = db.query(ReturnUpload).count()
         pending_returns = db.query(ReturnUpload).filter_by(upload_status='Pending').count()
         
@@ -323,7 +324,7 @@ async def dashboard(request: Request, current_user: User = Depends(get_current_u
         print(f"Content of historical_camels: {historical_camels}")
 
         # Prepare data for cross-institution comparison
-        all_active_institutions = db.query(Institution).filter_by(status='Active').all()
+        all_active_institutions = db.query(Institution).filter_by(status='ACTIVE').all()
         comparison_data = []
         for inst in all_active_institutions:
             latest_camels_for_inst = db.query(CAMELSRating).filter_by(institution_id=inst.id).order_by(CAMELSRating.calculated_at.desc()).first()
@@ -530,7 +531,7 @@ async def returns_list(request: Request):
 async def upload_return_get(request: Request):
     db = SessionLocal()
     try:
-        banks = db.query(Institution).filter_by(status='Active').order_by(Institution.name).all()
+        banks = db.query(Institution).filter_by(status='ACTIVE').order_by(Institution.name).all()
         return_periods = db.query(ReturnPeriod).order_by(ReturnPeriod.period_start.desc()).all()
         return templates.TemplateResponse('upload_return.html', {"request": request, "banks": banks, "return_periods": return_periods})
     finally:
@@ -564,17 +565,26 @@ async def upload_return_post(request: Request, bank_id: str = Form(...), return_
         # Create a draft return record
         db = SessionLocal()
         try:
+            file_type_map = {
+                'Deposits Return': FileType.DEPOSIT,
+                'Premium Calculation': FileType.PREMIUM,
+                'SCV Return': FileType.SCV,
+            }
+            mapped_type = file_type_map.get(return_type)
+            if mapped_type is None:
+                flash('Unsupported return type selected.', 'error')
+                return redirect(request.url)
+
             return_record = ReturnUpload(
-                id=str(uuid.uuid4()), # Add ID
-                institution_id=bank_id, # Use institution_id
-                period_id=return_period, # Use period_id
+                id=str(uuid.uuid4()),
+                period_id=return_period,
                 file_name=filename,
-                file_type=FileType(return_type), # Use FileType enum
+                file_type=mapped_type,
                 file_path=filepath,
-                file_size=os.path.getsize(filepath), # Add file_size
-                file_hash="dummy_hash", # Add file_hash
-                upload_status=ReturnStatus.UPLOADED, # Use ReturnStatus enum
-                uploaded_by=request.session.get('user_id') # Add uploaded_by
+                file_size=os.path.getsize(filepath),
+                file_hash="dummy_hash",
+                upload_status=ReturnStatus.UPLOADED,
+                uploaded_by=request.session.get('user_id') or 'system'
             )
             db.add(return_record)
             db.commit()
@@ -596,7 +606,7 @@ async def upload_return_post(request: Request, bank_id: str = Form(...), return_
 async def scv_upload_get(request: Request):
     db = SessionLocal()
     try:
-        banks = db.query(Institution).filter_by(status='Active').order_by(Institution.name).all()
+        banks = db.query(Institution).filter_by(status='ACTIVE').order_by(Institution.name).all()
         return_periods = db.query(ReturnPeriod).order_by(ReturnPeriod.period_start.desc()).all()
         return templates.TemplateResponse('scv_upload.html', {"request": request, "banks": banks, "return_periods": return_periods})
     finally:
@@ -1892,7 +1902,7 @@ async def surveillance(request: Request):
             DepositClassification.created_at.desc()
         ).limit(20).all()
         
-        banks = db.query(Institution).filter_by(status='Active').all()
+        banks = db.query(Institution).filter_by(status='ACTIVE').all()
 
         # Get latest classification for charts
         latest_classification = db.query(DepositClassification).order_by(DepositClassification.created_at.desc()).first()
@@ -1999,7 +2009,7 @@ async def scv_list(request: Request):
 async def api_banks():
     db = SessionLocal()
     try:
-        banks = db.query(Institution).filter_by(status='Active').all()
+        banks = db.query(Institution).filter_by(status='ACTIVE').all()
         return JSONResponse(content=[{
             'id': b.id,
             'code': b.code,
@@ -2043,4 +2053,5 @@ from penalty_engine import PenaltyEngine
 
 if __name__ == '__main__':
     init_database()
-    app.run(host='0.0.0.0', port=8400, debug=True)
+    # Use uvicorn for ASGI server
+    uvicorn.run(app, host='0.0.0.0', port=int(os.getenv('PORT', '8400')))
