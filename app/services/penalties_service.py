@@ -3,7 +3,7 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
 import uuid
 from decimal import Decimal
-from app.models.returns import Penalty, ReturnPeriod, Institution, ReturnUpload, ReturnStatus
+from models import Penalty, ReturnPeriod, Institution, ReturnUpload, ReturnStatus
 from app.schemas.returns import PenaltyResponse
 
 class PenaltiesService:

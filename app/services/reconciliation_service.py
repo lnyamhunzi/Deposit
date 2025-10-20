@@ -3,8 +3,7 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime, timedelta
 from decimal import Decimal
 import pandas as pd
-from app.models.premiums import Invoice, Payment, PremiumPenalty, PremiumStatus, PaymentStatus
-from app.models.returns import Institution
+from models import Invoice, Payment, PremiumPenalty, PremiumStatus, PaymentStatus, Institution
 from app.schemas.premiums import ReconciliationResponse
 
 class ReconciliationService:

@@ -7,8 +7,7 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime
 from decimal import Decimal
 import uuid
-from app.models.premiums import Payment, PaymentStatus, Invoice, PremiumStatus, PremiumPenalty
-from app.models.returns import Institution
+from models import Payment, PaymentStatus, Invoice, PremiumStatus, PremiumPenalty, Institution
 from app.schemas.premiums import PaymentUploadRequest, PaymentVerificationRequest, ReconciliationRequest, PaymentResponse, ReconciliationResponse
 
 class PaymentReceiptingService:

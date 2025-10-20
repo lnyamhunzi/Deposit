@@ -5,9 +5,17 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime, timedelta
 from decimal import Decimal
 import uuid
-from app.models.surveillance import DepositAnalysis, SurveillancePeriod, DepositType, AccountSize
-from app.models.returns import ReturnUpload, ReturnPeriod
-from app.models.returns import Institution
+from models import (
+    DepositAnalysis,
+    SurveillancePeriod,
+    DepositType,
+    AccountSize,
+    ReturnUpload,
+    ReturnPeriod,
+    Institution,
+    ReturnStatus,
+    FileType,
+)
 
 class DepositAnalysisService:
     def __init__(self, db: Session):
@@ -67,7 +75,7 @@ class DepositAnalysisService:
             ReturnPeriod.institution_id == institution_id,
             ReturnPeriod.period_start == period_start,
             ReturnPeriod.period_end == period_end,
-            ReturnPeriod.status == "SUBMITTED"
+            ReturnPeriod.status == ReturnStatus.SUBMITTED
         ).first()
         
         if not return_period:
@@ -76,7 +84,7 @@ class DepositAnalysisService:
         # Get deposit upload
         deposit_upload = self.db.query(ReturnUpload).filter(
             ReturnUpload.period_id == return_period.id,
-            ReturnUpload.file_type == "DEPOSIT"
+            ReturnUpload.file_type == FileType.DEPOSIT
         ).first()
         
         if not deposit_upload:
