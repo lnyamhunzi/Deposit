@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Audit Trail{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Audit Trail</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card">
+        <div class="card-header">
+            Recent Audit Records
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>User ID</th>
+                        <th>Action Type</th>
+                        <th>Entity Type</th>
+                        <th>Entity ID</th>
+                        <th>IP Address</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in audit_records %}
+                    <tr>
+                        <td>{{ record.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>{{ record.user_id }}</td>
+                        <td>{{ record.action_type }}</td>
+                        <td>{{ record.entity_type }}</td>
+                        <td>{{ record.entity_id if record.entity_id else 'N/A' }}</td>
+                        <td>{{ record.ip_address }}</td>
+                        <td><pre>{{ record.action_details | tojson(indent=2) }}</pre></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

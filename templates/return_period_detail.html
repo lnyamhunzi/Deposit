@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Return Period Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Return Period Details (ID: {{ period.id }})</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Period Information
+        </div>
+        <div class="card-body">
+            <p><strong>Institution:</strong> {{ period.institution.name }} ({{ period.institution.code }})</p>
+            <p><strong>Period Type:</strong> {{ period.period_type }}</p>
+            <p><strong>Start Date:</strong> {{ period.period_start.strftime('%Y-%m-%d') }}</p>
+            <p><strong>End Date:</strong> {{ period.period_end.strftime('%Y-%m-%d') }}</p>
+            <p><strong>Due Date:</strong> {{ period.due_date.strftime('%Y-%m-%d') }}</p>
+            <p><strong>Current Status:</strong> <span class="badge bg-info">{{ period.status }}</span></p>
+            <p><strong>Created At:</strong> {{ period.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+            <p><strong>Updated At:</strong> {{ period.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Update Status
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('return_period_detail_update', period_id=period.id) }}" method="POST">
+                <div class="mb-3">
+                    <label for="status" class="form-label">New Status</label>
+                    <select class="form-control" id="status" name="status" required>
+                        {% for status_enum in ReturnStatus %}
+                            <option value="{{ status_enum.value }}" {% if period.status.value == status_enum.value %}selected{% endif %}>{{ status_enum.value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Update Status</button>
+            </form>
+        </div>
+    </div>
+
+    <a href="{{ url_for('return_periods_list_create') }}" class="btn btn-secondary">Back to Return Periods</a>
+</div>
+{% endblock %}

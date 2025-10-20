@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+{% block title %}CAMELS Rating Details - Q-Sight{% endblock %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3"><i class="fas fa-chart-bar me-2"></i>CAMELS Rating Details</h2>
+        <h4>{{ rating.institution.name }} - {{ rating.period.period_end.strftime('%Y-%m-%d') }}</h4>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-label">Composite Rating</div>
+            <div class="stat-number"><span class="badge rating-{{ rating.composite_rating | int }} fs-1">{{ rating.composite_rating | round(2) }}</span></div>
+            <div class="small text-muted mt-2">Risk Grade: {{ rating.risk_grade }}</div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <div class="card"><div class="card-header"><h6 class="mb-0">Capital Adequacy</h6></div><div class="card-body">
+            <p><strong>Rating:</strong> <span class="badge rating-{{ rating.capital_adequacy_rating }}">{{ rating.capital_adequacy_rating }}</span></p>
+            <p><strong>Score:</strong> {{ rating.capital_adequacy_score | round(2) }}</p>
+            <p><strong>CAR:</strong> {{ "%.2f"|format(rating.capital_adequacy_components.capital_adequacy_ratio) }}%</p>
+            <p><strong>Tier 1 Ratio:</strong> {{ "%.2f"|format(rating.capital_adequacy_components.tier1_ratio) }}%</p>
+            <p><strong>Tier 2 Ratio:</strong> {{ "%.2f"|format(rating.capital_adequacy_components.tier2_ratio) }}%</p>
+        </div></div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card"><div class="card-header"><h6 class="mb-0">Asset Quality</h6></div><div class="card-body">
+            <p><strong>Rating:</strong> <span class="badge rating-{{ rating.asset_quality_rating }}">{{ rating.asset_quality_rating }}</span></p>
+            <p><strong>Score:</strong> {{ rating.asset_quality_score | round(2) }}</p>
+            <p><strong>Net NPA Ratio:</strong> {{ "%.2f"|format(rating.asset_quality_components.net_npa_ratio) }}%</p>
+            <p><strong>Asset Concentration:</strong> {{ "%.2f"|format(rating.asset_quality_components.asset_concentration) }}%</p>
+        </div></div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card"><div class="card-header"><h6 class="mb-0">Management Quality</h6></div><div class="card-body">
+            <p><strong>Rating:</strong> <span class="badge rating-{{ rating.management_quality_rating }}">{{ rating.management_quality_rating }}</span></p>
+            <p><strong>Score:</strong> {{ rating.management_quality_score | round(2) }}</p>
+        </div></div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card"><div class="card-header"><h6 class="mb-0">Earnings</h6></div><div class="card-body">
+            <p><strong>Rating:</strong> <span class="badge rating-{{ rating.earnings_rating }}">{{ rating.earnings_rating }}</span></p>
+            <p><strong>Score:</strong> {{ rating.earnings_score | round(2) }}</p>
+            <p><strong>ROA:</strong> {{ "%.2f"|format(rating.earnings_components.return_on_assets) }}%</p>
+            <p><strong>ROE:</strong> {{ "%.2f"|format(rating.earnings_components.return_on_equity) }}%</p>
+            <p><strong>Earnings Trend:</strong> {{ "%.2f"|format(rating.earnings_components.earnings_trend) }}%</p>
+        </div></div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card"><div class="card-header"><h6 class="mb-0">Liquidity</h6></div><div class="card-body">
+            <p><strong>Rating:</strong> <span class="badge rating-{{ rating.liquidity_rating }}">{{ rating.liquidity_rating }}</span></p>
+            <p><strong>Score:</strong> {{ rating.liquidity_score | round(2) }}</p>
+            <p><strong>Liquidity Ratio:</strong> {{ "%.2f"|format(rating.liquidity_components.liquidity_ratio) }}%</p>
+            <p><strong>Loan to Deposit Ratio:</strong> {{ "%.2f"|format(rating.liquidity_components.loan_to_deposit) }}%</p>
+        </div></div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card"><div class="card-header"><h6 class="mb-0">Sensitivity</h6></div><div class="card-body">
+            <p><strong>Rating:</strong> <span class="badge rating-{{ rating.sensitivity_rating }}">{{ rating.sensitivity_rating }}</span></p>
+            <p><strong>Score:</strong> {{ rating.sensitivity_score | round(2) }}</p>
+            <p><strong>FX Risk:</strong> {{ "%.2f"|format(rating.sensitivity_components.fx_risk) }}%</p>
+            <p><strong>Market Concentration:</strong> {{ "%.2f"|format(rating.sensitivity_components.market_concentration) }}%</p>
+        </div></div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0">CAMELS Rating Trend</h5></div>
+            <div class="card-body">
+                <div id="camels-trend-chart"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0">Stress Testing Scenarios</h5></div>
+            <div class="card-body">
+                <form action="{{ url_for('run_stress_test_flask') }}" method="POST" class="d-inline">
+                    <input type="hidden" name="institution_id" value="{{ rating.institution_id }}">
+                    <input type="hidden" name="scenario_type" value="EXCHANGE_RATE_SHOCK">
+                    <button type="submit" name="severity" value="MILD" class="btn btn-warning btn-sm me-2">FX Shock (Mild)</button>
+                    <button type="submit" name="severity" value="MODERATE" class="btn btn-warning btn-sm me-2">FX Shock (Moderate)</button>
+                    <button type="submit" name="severity" value="SEVERE" class="btn btn-warning btn-sm">FX Shock (Severe)</button>
+                </form>
+                <form action="{{ url_for('run_stress_test_flask') }}" method="POST" class="d-inline ms-3">
+                    <input type="hidden" name="institution_id" value="{{ rating.institution_id }}">
+                    <input type="hidden" name="scenario_type" value="LIQUIDITY_SHOCK">
+                    <button type="submit" name="severity" value="MILD" class="btn btn-info btn-sm me-2">Liquidity Shock (Mild)</button>
+                    <button type="submit" name="severity" value="MODERATE" class="btn btn-info btn-sm me-2">Liquidity Shock (Moderate)</button>
+                    <button type="submit" name="severity" value="SEVERE" class="btn btn-info btn-sm">Liquidity Shock (Severe)</button>
+                </form>
+                <form action="{{ url_for('run_stress_test_flask') }}" method="POST" class="d-inline ms-3">
+                    <input type="hidden" name="institution_id" value="{{ rating.institution_id }}">
+                    <input type="hidden" name="scenario_type" value="INTEREST_RATE_SHOCK">
+                    <button type="submit" name="severity" value="MILD" class="btn btn-danger btn-sm me-2">IR Shock (Mild)</button>
+                    <button type="submit" name="severity" value="MODERATE" class="btn btn-danger btn-sm me-2">IR Shock (Moderate)</button>
+                    <button type="submit" name="severity" value="SEVERE" class="btn btn-danger btn-sm">IR Shock (Severe)</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if session.stress_test_results %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white"><h5 class="mb-0">Stress Test Results: {{ session.stress_test_results.scenario.type }} ({{ session.stress_test_results.scenario.severity }})</h5></div>
+            <div class="card-body">
+                {% set results = session.stress_test_results %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Scenario Parameters:</h6>
+                        <ul>
+                            {% for key, value in results.scenario.parameters.items() %}
+                                <li><strong>{{ key|replace('_', ' ')|title }}:</strong> {{ value }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Capital Adequacy Impact:</h6>
+                        <p><strong>Current CAR:</strong> {{ "%.2f"|format(results.capital_adequacy_impact.current_car) }}%</p>
+                        <p><strong>Stressed CAR:</strong> {{ "%.2f"|format(results.capital_adequacy_impact.stressed_car) }}%</p>
+                        <p><strong>Capital Shortfall:</strong> {{ "%.2f"|format(results.capital_adequacy_impact.additional_capital_required) }}</p>
+                        <p><strong>Meets Requirements:</strong> {{ "Yes" if results.capital_adequacy_impact.meets_requirements else "No" }}</p>
+                    </div>
+                </div>
+                <hr>
+                <h6>Impact Analysis on Key Metrics:</h6>
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Current</th>
+                            <th>Stressed</th>
+                            <th>Change (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for metric, values in results.impact_analysis.items() %}
+                            {% if metric != 'regulatory_ratios' %}
+                            <tr>
+                                <td>{{ metric|replace('_', ' ')|title }}</td>
+                                <td>{{ "%.2f"|format(values.current) }}</td>
+                                <td>{{ "%.2f"|format(values.stressed) }}</td>
+                                <td>{{ "%.2f"|format(values.change_percentage) }}%</td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <hr>
+                <h6>Regulatory Ratios Impact:</h6>
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Ratio</th>
+                            <th>Current</th>
+                            <th>Stressed</th>
+                            <th>Change (%)</th>
+                            <th>Meets Req.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ratio, values in results.impact_analysis.regulatory_ratios.items() %}
+                            <tr>
+                                <td>{{ ratio|upper }}</td>
+                                <td>{{ "%.2f"|format(values.current) }}%</td>
+                                <td>{{ "%.2f"|format(values.stressed) }}%</td>
+                                <td>{{ "%.2f"|format(values.change_percentage) }}%</td>
+                                <td>{{ "Yes" if values.meets_requirement else "No" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <hr>
+                <h6>CAMELS Deterioration:</h6>
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Current Score</th>
+                            <th>Stressed Score</th>
+                            <th>Current Rating</th>
+                            <th>Stressed Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for component, values in results.camels_comparison.deterioration.items() %}
+                            {% if component != 'composite' %}
+                            <tr>
+                                <td>{{ component|replace('_', ' ')|title }}</td>
+                                <td>{{ "%.2f"|format(values.current_score) }}</td>
+                                <td>{{ "%.2f"|format(values.stressed_score) }}</td>
+                                <td>{{ values.rating_change.split(' -> ')[0] }}</td>
+                                <td>{{ values.rating_change.split(' -> ')[1] }}</td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                        <tr>
+                            <td><strong>Composite</strong></td>
+                            <td>{{ "%.2f"|format(results.camels_comparison.deterioration.composite.current_rating) }}</td>
+                            <td>{{ "%.2f"|format(results.camels_comparison.deterioration.composite.stressed_rating) }}</td>
+                            <td>{{ results.camels_comparison.deterioration.composite.risk_grade_change.split(' -> ')[0] }}</td>
+                            <td>{{ results.camels_comparison.deterioration.composite.risk_grade_change.split(' -> ')[1] }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <hr>
+                <h6>Risk Metrics:</h6>
+                <p><strong>Probability of Default (Stressed):</strong> {{ "%.2f"|format(results.risk_metrics.probability_of_default * 100) }}%</p>
+                <p><strong>Capital Shortfall:</strong> {{ "%.2f"|format(results.risk_metrics.capital_shortfall) }}</p>
+                <p><strong>Liquidity Gap:</strong> {{ "%.2f"|format(results.risk_metrics.liquidity_gap) }}%</p>
+                <hr>
+                <h6>Recommendations:</h6>
+                <ul>
+                    {% for recommendation in results.recommendations %}
+                        <li>{{ recommendation }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% set _ = session.pop('stress_test_results', None) %}
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    var chartData = {
+        periods: {{ chart_data.periods | tojson }},
+        composite: {{ chart_data.composite | tojson }},
+        capital: {{ chart_data.capital | tojson }},
+        assets: {{ chart_data.assets | tojson }},
+        management: {{ chart_data.management | tojson }},
+        earnings: {{ chart_data.earnings | tojson }},
+        liquidity: {{ chart_data.liquidity | tojson }},
+        sensitivity: {{ chart_data.sensitivity | tojson }}
+    };
+
+    var trace_composite = {
+        x: chartData.periods,
+        y: chartData.composite,
+        mode: 'lines+markers',
+        name: 'Composite',
+        line: { color: '#1e3a5f', width: 4 }
+    };
+
+    var trace_capital = { x: chartData.periods, y: chartData.capital, mode: 'lines', name: 'Capital', line: { dash: 'dot' } };
+    var trace_assets = { x: chartData.periods, y: chartData.assets, mode: 'lines', name: 'Assets', line: { dash: 'dot' } };
+    var trace_management = { x: chartData.periods, y: chartData.management, mode: 'lines', name: 'Management', line: { dash: 'dot' } };
+    var trace_earnings = { x: chartData.periods, y: chartData.earnings, mode: 'lines', name: 'Earnings', line: { dash: 'dot' } };
+    var trace_liquidity = { x: chartData.periods, y: chartData.liquidity, mode: 'lines', name: 'Liquidity', line: { dash: 'dot' } };
+    var trace_sensitivity = { x: chartData.periods, y: chartData.sensitivity, mode: 'lines', name: 'Sensitivity', line: { dash: 'dot' } };
+
+    var layout = {
+        title: 'Historical CAMELS Rating Trend',
+        yaxis: { autorange: 'reversed', title: 'Rating (1 is best)' },
+        xaxis: { title: 'Period' },
+        legend: { orientation: 'h', y: -0.2 }
+    };
+
+    Plotly.newPlot('camels-trend-chart', [
+        trace_composite, trace_capital, trace_assets, trace_management, 
+        trace_earnings, trace_liquidity, trace_sensitivity
+    ], layout);
+});
+</script>
+{% endblock %}

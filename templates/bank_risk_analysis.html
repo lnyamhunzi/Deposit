@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Risk Analysis - {{ bank.name }}{% endblock %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3"><i class="fas fa-exclamation-triangle me-2"></i>Risk Analysis for {{ bank.name }}</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0">Risk Assessment Input</h5></div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-3 mb-3"><label class="form-label">Assessment Period</label><input type="text" name="assessment_period" class="form-control" value="2025-Q1" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Capital Adequacy Ratio</label><input type="number" name="capital_adequacy_ratio" step="0.01" class="form-control" value="12.0" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Tier 1 Ratio</label><input type="number" name="tier1_ratio" step="0.01" class="form-control" value="8.0" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">NPA Ratio</label><input type="number" name="npa_ratio" step="0.01" class="form-control" value="3.0" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Provision Coverage Ratio</label><input type="number" name="provision_coverage_ratio" step="0.01" class="form-control" value="70.0" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Return on Assets</label><input type="number" name="return_on_assets" step="0.01" class="form-control" value="1.0" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Return on Equity</label><input type="number" name="return_on_equity" step="0.01" class="form-control" value="10.0" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Net Interest Margin</label><input type="number" name="net_interest_margin" step="0.01" class="form-control" value="3.5" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Cost to Income Ratio</label><input type="number" name="cost_to_income_ratio" step="0.01" class="form-control" value="60.0" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Liquidity Ratio</label><input type="number" name="liquidity_ratio" step="0.01" class="form-control" value="25.0" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Loan to Deposit Ratio</label><input type="number" name="loan_to_deposit_ratio" step="0.01" class="form-control" value="85.0" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Asset Growth Rate</label><input type="number" name="asset_growth_rate" step="0.01" class="form-control" value="5.0" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Deposit Growth Rate</label><input type="number" name="deposit_growth_rate" step="0.01" class="form-control" value="5.0" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Loan Growth Rate</label><input type="number" name="loan_growth_rate" step="0.01" class="form-control" value="5.0" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Operating Expense Ratio</label><input type="number" name="operating_expense_ratio" step="0.01" class="form-control" value="70.0" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Equity to Assets Ratio</label><input type="number" name="equity_to_assets_ratio" step="0.01" class="form-control" value="10.0" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Earning Assets Ratio</label><input type="number" name="earning_assets_ratio" step="0.01" class="form-control" value="80.0" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Volatility of Earnings</label><input type="number" name="volatility_of_earnings" step="0.01" class="form-control" value="2.0" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Concentration Risk</label><input type="number" name="concentration_risk" step="0.01" class="form-control" value="15.0" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">FX Exposure</label><input type="number" name="fx_exposure" step="0.01" class="form-control" value="5.0" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Interest Rate Gap</label><input type="number" name="interest_rate_gap" step="0.01" class="form-control" value="10.0" required></div>
+                    </div>
+                    <div class="d-grid"><button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-chart-line me-2"></i>Run Risk Analysis</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if anomaly_results %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card border-{{ 'danger' if anomaly_results.risk_assessment.risk_level == 'CRITICAL' or anomaly_results.risk_assessment.risk_level == 'HIGH' else 'warning' if anomaly_results.risk_assessment.risk_level == 'MODERATE' else 'success' }}">
+            <div class="card-header bg-{{ 'danger' if anomaly_results.risk_assessment.risk_level == 'CRITICAL' or anomaly_results.risk_assessment.risk_level == 'HIGH' else 'warning' if anomaly_results.risk_assessment.risk_level == 'MODERATE' else 'success' }} text-white">
+                <h5 class="mb-0"><i class="fas fa-bug me-2"></i>Anomaly Detection Results</h5>
+            </div>
+            <div class="card-body">
+                {% set risk_assessment = anomaly_results.risk_assessment %}
+                <p class="lead"><strong>Anomaly Risk Level:</strong> <span class="badge bg-{{ 'danger' if risk_assessment.risk_level == 'CRITICAL' or risk_assessment.risk_level == 'HIGH' else 'warning' if risk_assessment.risk_level == 'MODERATE' else 'success' }}">{{ risk_assessment.risk_level }}</span></p>
+                <p><strong>Anomaly Count:</strong> {{ risk_assessment.anomaly_count }}</p>
+                <p><strong>Anomaly Rate:</strong> {{ "%.2f"|format(risk_assessment.anomaly_rate * 100) }}%</p>
+                <p><strong>Severity Assessment:</strong> {{ risk_assessment.severity_assessment }}</p>
+                <hr>
+                <h6>Recommended Actions:</h6>
+                {% if risk_assessment.recommended_actions %}
+                    <ul>
+                        {% for action in risk_assessment.recommended_actions %}
+                            <li>{{ action }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No specific recommendations at this time.</p>
+                {% endif %}
+                <hr>
+                <h6>Top Anomalies Details:</h6>
+                {% if risk_assessment.top_anomalies_details %}
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Record Index</th>
+                                <th>Anomaly Score</th>
+                                <th>Data Preview</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for anomaly in risk_assessment.top_anomalies_details %}
+                                <tr>
+                                    <td>{{ anomaly.record_index }}</td>
+                                    <td>{{ "%.2f"|format(anomaly.anomaly_score) }}</td>
+                                    <td>
+                                        {% for key, value in anomaly.data_preview.items() %}
+                                            <strong>{{ key }}:</strong> {{ value }}<br>
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>No top anomalies to display.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Early Warning Signal Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Early Warning Signal Details (ID: {{ signal.id }})</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Signal Information
+        </div>
+        <div class="card-body">
+            <p><strong>Institution:</strong> {{ signal.institution.name }} ({{ signal.institution.code }})</p>
+            <p><strong>Signal Type:</strong> {{ signal.signal_type }}</p>
+            <p><strong>Severity:</strong> <span class="badge bg-{{ 'danger' if signal.severity == 'CRITICAL' else 'warning' if signal.severity == 'HIGH' else 'info' }}">{{ signal.severity }}</span></p>
+            <p><strong>Description:</strong> {{ signal.description }}</p>
+            <p><strong>Triggered At:</strong> {{ signal.triggered_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+            <p><strong>Resolved At:</strong> {{ signal.resolved_at.strftime('%Y-%m-%d %H:%M:%S') if signal.resolved_at else 'N/A' }}</p>
+            <p><strong>Status:</strong> <span class="badge bg-{{ 'success' if signal.status == 'RESOLVED' else 'danger' if signal.status == 'ACTIVE' else 'info' }}">{{ signal.status }}</span></p>
+            <p><strong>Created At:</strong> {{ signal.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        </div>
+    </div>
+
+    {% if signal.trigger_metrics %}
+    <div class="card mb-4">
+        <div class="card-header">
+            Trigger Metrics
+        </div>
+        <div class="card-body">
+            <pre>{{ signal.trigger_metrics | tojson(indent=2) }}</pre>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if signal.recommended_actions %}
+    <div class="card mb-4">
+        <div class="card-header">
+            Recommended Actions
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                {% for action in signal.recommended_actions %}
+                    <li class="list-group-item">{{ action }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    <a href="{{ url_for('early_warning_signals_list_create') }}" class="btn btn-secondary">Back to Early Warning Signals</a>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Upload SCV File{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Upload Single Customer View (SCV) File</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <div class="card">
+        <div class="card-body">
+            <form action="{{ url_for('scv_upload') }}" method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="institution_id" class="form-label">Institution</label>
+                    <select class="form-control" id="institution_id" name="institution_id" required>
+                        <option value="">Select Institution</option>
+                        {% for bank in banks %}
+                            <option value="{{ bank.id }}">{{ bank.name }} ({{ bank.code }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="period_id" class="form-label">Return Period</label>
+                    <select class="form-control" id="period_id" name="period_id" required>
+                        <option value="">Select Period</option>
+                        {% for period in return_periods %}
+                            <option value="{{ period.id }}">{{ period.period_type }} - {{ period.period_start.strftime('%Y-%m-%d') }} to {{ period.period_end.strftime('%Y-%m-%d') }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="file" class="form-label">SCV File (Excel or CSV)</label>
+                    <input type="file" class="form-control" id="file" name="file" accept=".xlsx,.xls,.csv" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Upload SCV</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

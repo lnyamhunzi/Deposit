@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q-Sight Regulatory System</title>
+    <!-- Load Tailwind CSS from CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* Custom Tailwind Configuration for Finance Theme */
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-navy': '#1D4ED8', /* Tailwind: blue-700 */
+                        /* Keeping the custom color definitions for reference/other elements, 
+                           but using standard teal-500 for the button to ensure reliability. */
+                        'secondary-teal': '#14B8A6', /* Tailwind: teal-500 */ 
+                        'bg-light': '#F9FAFB', /* Tailwind: gray-50 */
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+        /* Custom scroll behavior for the body */
+        body {
+            background-color: #F9FAFB;
+            font-family: 'Inter', sans-serif;
+            padding-top: 64px; /* Space for smaller fixed header (h-16) */
+        }
+        .card-icon {
+            text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Fixed Navigation Header with Login Button -->
+<header class="fixed top-0 left-0 w-full bg-white shadow-md z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <!-- Logo/Title: Full name on desktop, shorter name on mobile -->
+            <a href="#" class="flex items-center space-x-3">
+                <i class="fas fa-shield-alt text-primary-navy text-3xl"></i>
+                <!-- Full title for desktop (sm:block) -->
+                <span class="text-xl font-extrabold tracking-tight text-primary-navy hidden sm:block">Q-Sight Regulatory System</span>
+                <!-- Shorter title for mobile (sm:hidden) -->
+                <span class="text-2xl font-extrabold tracking-tight text-primary-navy block sm:hidden">Q-Sight</span>
+            </a>
+            
+            <!-- Login Button - Changed bg-secondary-teal to bg-teal-500 for immediate visibility -->
+            <button onclick="window.location.href='/login'" 
+                    class="px-6 py-2 bg-teal-500 text-white font-semibold rounded-full shadow-lg hover:bg-teal-600 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-teal-300">
+                <i class="fas fa-sign-in-alt mr-2"></i>
+                Login to System
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content Area -->
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"> <!-- Reduced py-10 to py-8 for more compact feel -->
+
+    <!-- Hero Section -->
+    <div class="text-center mb-10 p-8 bg-white rounded-xl shadow-xl border-t-4 border-primary-navy">
+        <h1 class="text-4xl sm:text-5xl font-extrabold text-primary-navy mb-4 leading-tight">
+            Q-Sight Regulatory System
+        </h1>
+        <p class="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
+            Banking Regulatory Platform for Deposit Protection Corporation Zimbabwe, powered by advanced analytics.
+        </p>
+    </div>
+
+    <!-- Feature Cards Grid (Key Functionality) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10"> <!-- Reduced mb-12 to mb-10 -->
+        
+        <!-- Returns Management -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border-2 border-transparent hover:border-primary-navy transition duration-300 h-full flex flex-col items-center text-center">
+            <i class="fas fa-file-upload fa-3x text-primary-navy mb-4 card-icon"></i>
+            <h5 class="text-xl font-bold text-gray-800 mb-2">Returns Management</h5>
+            <p class="text-gray-500 mb-4 flex-grow">Upload, validate, and manage bank returns with automated validation and control totals.</p>
+            <a href="/returns/upload" class="mt-auto w-full max-w-[200px] py-2 bg-primary-navy text-white font-medium rounded-lg hover:bg-blue-800 transition duration-150">Upload Returns</a>
+        </div>
+        
+        <!-- CAMELS Rating -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border-2 border-transparent hover:border-primary-navy transition duration-300 h-full flex flex-col items-center text-center">
+            <i class="fas fa-chart-bar fa-3x text-teal-500 mb-4 card-icon"></i> <!-- Changed text-secondary-teal to text-teal-500 -->
+            <h5 class="text-xl font-bold text-gray-800 mb-2">CAMELS Rating</h5>
+            <p class="text-gray-500 mb-4 flex-grow">Calculate comprehensive CAMELS ratings for banking institutions with early warning indicators.</p>
+            <!-- Changed bg-secondary-teal to bg-teal-500 for consistency and reliability -->
+            <a href="/camels" class="mt-auto w-full max-w-[200px] py-2 bg-teal-500 text-white font-medium rounded-lg hover:bg-teal-600 transition duration-150">View CAMELS</a>
+        </div>
+        
+        <!-- Risk Analysis -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border-2 border-transparent hover:border-primary-navy transition duration-300 h-full flex flex-col items-center text-center">
+            <i class="fas fa-exclamation-triangle fa-3x text-amber-500 mb-4 card-icon"></i>
+            <h5 class="text-xl font-bold text-gray-800 mb-2">Risk Analysis</h5>
+            <p class="text-gray-500 mb-4 flex-grow">Advanced risk scoring with ML-powered failure prediction and anomaly detection.</p>
+            <a href="/risk-analysis" class="mt-auto w-full max-w-[200px] py-2 bg-amber-500 text-white font-medium rounded-lg hover:bg-amber-600 transition duration-150">Analyze Risk</a>
+        </div>
+
+        <!-- Premium Management -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border-2 border-transparent hover:border-primary-navy transition duration-300 h-full flex flex-col items-center text-center">
+            <i class="fas fa-dollar-sign fa-3x text-green-600 mb-4 card-icon"></i>
+            <h5 class="text-xl font-bold text-gray-800 mb-2">Premium Management</h5>
+            <p class="text-gray-500 mb-4 flex-grow">Automated premium calculation, invoicing, payment tracking, and reconciliation.</p>
+            <a href="/premiums" class="mt-auto w-full max-w-[200px] py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition duration-150">Manage Premiums</a>
+        </div>
+        
+        <!-- Bank Surveillance -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border-2 border-transparent hover:border-primary-navy transition duration-300 h-full flex flex-col items-center text-center">
+            <i class="fas fa-eye fa-3x text-gray-700 mb-4 card-icon"></i>
+            <h5 class="text-xl font-bold text-gray-800 mb-2">Bank Surveillance</h5>
+            <p class="text-gray-500 mb-4 flex-grow">Monitor deposits, exposures, and trends across all banking institutions in real-time.</p>
+            <a href="/surveillance" class="mt-auto w-full max-w-[200px] py-2 bg-gray-700 text-white font-medium rounded-lg hover:bg-gray-800 transition duration-150">View Surveillance</a>
+        </div>
+        
+        <!-- Single Customer View -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border-2 border-transparent hover:border-primary-navy transition duration-300 h-full flex flex-col items-center text-center">
+            <i class="fas fa-users fa-3x text-red-600 mb-4 card-icon"></i>
+            <h5 class="text-xl font-bold text-gray-800 mb-2">Single Customer View (SCV)</h5>
+            <p class="text-gray-500 mb-4 flex-grow">Consolidated customer exposure and crucial payout simulation capabilities.</p>
+            <a href="/single-customer-view" class="mt-auto w-full max-w-[200px] py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition duration-150">View SCV</a>
+        </div>
+    </div>
+
+    <!-- System Features Section -->
+    <div class="bg-white rounded-xl shadow-xl p-8">
+        <div class="flex items-center border-b pb-4 mb-6 border-gray-200">
+            <i class="fas fa-info-circle text-primary-navy text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-gray-800">System Features & Analytics</h2>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div>
+                <h3 class="text-lg font-bold text-primary-navy mb-3">Core Capabilities</h3>
+                <ul class="space-y-3">
+                    <li class="flex items-start text-gray-700"><i class="fas fa-check text-green-500 mt-1 mr-3"></i>Complete CAMELS rating calculations (Capital, Assets, Management, Earnings, Liquidity, Sensitivity)</li>
+                    <li class="flex items-start text-gray-700"><i class="fas fa-check text-green-500 mt-1 mr-3"></i>Machine learning models for bank failure prediction</li>
+                    <li class="flex items-start text-gray-700"><i class="fas fa-check text-green-500 mt-1 mr-3"></i>Anomaly detection using advanced time-series algorithms</li>
+                    <li class="flex items-start text-gray-700"><i class="fas fa-check text-green-500 mt-1 mr-3"></i>Stress testing and scenario analysis framework</li>
+                    <li class="flex items-start text-gray-700"><i class="fas fa-check text-green-500 mt-1 mr-3"></i>PD/LGD/EAD risk scoring models for exposure management</li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-primary-navy mb-3">Advanced Analytics</h3>
+                <ul class="space-y-3">
+                    <li class="flex items-start text-gray-700"><i class="fas fa-check text-green-500 mt-1 mr-3"></i>Automated deposit classification and exposure calculation</li>
+                    <li class="flex items-start text-gray-700"><i class="fas fa-check text-green-500 mt-1 mr-3"></i>Multi-dimensional trend analysis and forecasting</li>
+                    <li class="flex items-start text-gray-700"><i class="fas fa-check text-green-500 mt-1 mr-3"></i>Interactive dashboards with real-time KPIs and drill-down functionality</li>
+                    <li class="flex items-start text-gray-700"><i class="fas fa-check text-green-500 mt-1 mr-3"></i>Risk-based and flat-rate premium calculations</li>
+                    <li class="flex items-start text-gray-700"><i class="fas fa-check text-green-500 mt-1 mr-3"></i>Comprehensive returns validation engine with immediate feedback</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+
+
+</body>
+</html>

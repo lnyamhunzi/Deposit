@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Premium Calculation Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Premium Calculation Details (ID: {{ calculation.id }})</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Calculation Information
+        </div>
+        <div class="card-body">
+            <p><strong>Institution:</strong> {{ calculation.institution.name }} ({{ calculation.institution.code }})</p>
+            <p><strong>Period:</strong> {{ calculation.period.period_type }} ({{ calculation.period.period_start.strftime('%Y-%m-%d') }} to {{ calculation.period.period_end.strftime('%Y-%m-%d') }})</p>
+            <p><strong>Calculation Method:</strong> {{ calculation.calculation_method }}</p>
+            <p><strong>Total Eligible Deposits:</strong> ${{ "%.2f"|format(calculation.total_eligible_deposits) }}</p>
+            <p><strong>Average Eligible Deposits:</strong> ${{ "%.2f"|format(calculation.average_eligible_deposits) }}</p>
+            <p><strong>Base Premium Rate:</strong> {{ "%.4f"|format(calculation.base_premium_rate) }}</p>
+            <p><strong>Risk Adjustment Factor:</strong> {{ "%.4f"|format(calculation.risk_adjustment_factor) }}</p>
+            <p><strong>Risk Premium Rate:</strong> {{ "%.4f"|format(calculation.risk_premium_rate) }}</p>
+            <p><strong>Calculated Premium:</strong> ${{ "%.2f"|format(calculation.calculated_premium) }}</p>
+            <p><strong>Final Premium:</strong> ${{ "%.2f"|format(calculation.final_premium) }}</p>
+            <p><strong>Status:</strong> <span class="badge bg-info">{{ calculation.status }}</span></p>
+            <p><strong>Calculated By:</strong> {{ calculation.calculated_by }}</p>
+            <p><strong>Calculated At:</strong> {{ calculation.calculated_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        </div>
+    </div>
+
+    <a href="{{ url_for('premium_calculations_list_create') }}" class="btn btn-secondary">Back to Premium Calculations</a>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Single Customer View - Q-Sight{% endblock %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3"><i class="fas fa-users me-2"></i>Single Customer View</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0">Customer Exposure Records</h5></div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="scvTable">
+                        <thead>
+                            <tr><th>Bank</th><th>Customer ID</th><th>Customer Name</th><th>Type</th><th>Total Balance</th><th>Insured Amount</th><th>Uninsured Amount</th><th>Accounts</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for scv in scv_records %}
+                            <tr>
+                                <td><strong>{{ scv.bank.bank_name if scv.bank else 'N/A' }}</strong></td>
+                                <td>{{ scv.customer_id }}</td>
+                                <td>{{ scv.customer_name }}</td>
+                                <td>{{ scv.customer_type }}</td>
+                                <td>${{ "{:,.2f}".format(scv.net_balance) }}</td>
+                                <td>${{ "{:,.2f}".format(scv.insured_amount) }}</td>
+                                <td>${{ "{:,.2f}".format(scv.uninsured_amount) }}</td>
+                                <td>{{ scv.accounts|length if scv.accounts else 0 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>$(document).ready(function() { $('#scvTable').DataTable({pageLength: 25}); });</script>
+{% endblock %}

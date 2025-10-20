@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}System Configuration{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">System Configuration</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Edit Configuration
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('system_config_manage') }}" method="POST">
+                {% for config in configs %}
+                <div class="mb-3">
+                    <label for="{{ config.config_key }}" class="form-label">{{ config.config_key }} ({{ config.config_type }})</label>
+                    {% if config.config_type == 'boolean' %}
+                        <select class="form-control" id="{{ config.config_key }}" name="{{ config.config_key }}">
+                            <option value="True" {% if config.config_value == 'True' %}selected{% endif %}>True</option>
+                            <option value="False" {% if config.config_value == 'False' %}selected{% endif %}>False</option>
+                        </select>
+                    {% elif config.config_type == 'text' %}
+                        <textarea class="form-control" id="{{ config.config_key }}" name="{{ config.config_key }}" rows="3">{{ config.config_value }}</textarea>
+                    {% else %}
+                        <input type="text" class="form-control" id="{{ config.config_key }}" name="{{ config.config_key }}" value="{{ config.config_value }}">
+                    {% endif %}
+                    <small class="form-text text-muted">{{ config.description }}</small>
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary">Save Configuration</button>
+            </form>
+        </div>
+    </div>
+
+    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Back to Dashboard">Back to Dashboard</a>
+</div>
+{% endblock %}

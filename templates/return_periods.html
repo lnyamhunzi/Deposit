@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Return Periods{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Return Periods</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Create New Return Period
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('return_periods_list_create') }}" method="POST">
+                <div class="mb-3">
+                    <label for="institution_id" class="form-label">Institution</label>
+                    <select class="form-control" id="institution_id" name="institution_id" required>
+                        <option value="">Select Institution</option>
+                        {% for bank in banks %}
+                            <option value="{{ bank.id }}">{{ bank.name }} ({{ bank.code }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="period_type" class="form-label">Period Type</label>
+                    <select class="form-control" id="period_type" name="period_type" required>
+                        <option value="MONTHLY">MONTHLY</option>
+                        <option value="QUARTERLY">QUARTERLY</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="period_start" class="form-label">Period Start Date</label>
+                    <input type="date" class="form-control" id="period_start" name="period_start" required>
+                </div>
+                <div class="mb-3">
+                    <label for="period_end" class="form-label">Period End Date</label>
+                    <input type="date" class="form-control" id="period_end" name="period_end" required>
+                </div>
+                <div class="mb-3">
+                    <label for="due_date" class="form-label">Due Date</label>
+                    <input type="date" class="form-control" id="due_date" name="due_date" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Create Period</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            Existing Return Periods
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Institution</th>
+                        <th>Type</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for period in periods %}
+                    <tr>
+                        <td>{{ period.id }}</td>
+                        <td>{{ period.institution.name }}</td>
+                        <td>{{ period.period_type }}</td>
+                        <td>{{ period.period_start.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ period.period_end.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ period.due_date.strftime('%Y-%m-%d') }}</td>
+                        <td><span class="badge bg-info">{{ period.status }}</span></td>
+                        <td>
+                            <a href="{{ url_for('return_period_detail_update', period_id=period.id) }}" class="btn btn-sm btn-info">View/Edit</a>
+                            <a href="{{ url_for('return_upload_details', upload_id=period.id) }}" class="btn btn-sm btn-primary">Uploads</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

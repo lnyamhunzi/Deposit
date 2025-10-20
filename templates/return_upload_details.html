@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Return Upload Details{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Return Upload Details (ID: {{ upload.id }})</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Upload Information
+        </div>
+        <div class="card-body">
+            <p><strong>Period:</strong> {{ upload.period.period_type }} ({{ upload.period.period_start.strftime('%Y-%m-%d') }} to {{ upload.period.period_end.strftime('%Y-%m-%d') }})</p>
+            <p><strong>File Name:</strong> {{ upload.file_name }}</p>
+            <p><strong>File Type:</strong> {{ upload.file_type }}</p>
+            <p><strong>File Size:</strong> {{ (upload.file_size / 1024 / 1024)|round(2) }} MB</p>
+            <p><strong>Upload Status:</strong> <span class="badge bg-{{ 'success' if upload.upload_status == 'SUBMITTED' else 'info' if upload.upload_status == 'UPLOADED' else 'danger' }}">{{ upload.upload_status }}</span></p>
+            <p><strong>Uploaded By:</strong> {{ upload.uploaded_by }}</p>
+            <p><strong>Uploaded At:</strong> {{ upload.uploaded_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+            <p><strong>Submitted At:</strong> {{ upload.submitted_at.strftime('%Y-%m-%d %H:%M:%S') if upload.submitted_at else 'N/A' }}</p>
+            <p><strong>File Hash:</strong> {{ upload.file_hash }}</p>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <a href="{{ url_for('return_periods_list_create') }}" class="btn btn-secondary">Back to Return Periods</a>
+        <a href="{{ url_for('return_upload_validation_results', upload_id=upload.id) }}" class="btn btn-info">View Validation Results</a>
+        <a href="{{ url_for('return_upload_validation_report', upload_id=upload.id) }}" class="btn btn-info">View Validation Report</a>
+        {% if upload.upload_status == 'UPLOADED' or upload.upload_status == 'VALIDATED' %}
+            <form action="{{ url_for('archive_return_upload', upload_id=upload.id) }}" method="POST" class="d-inline">
+                <button type="submit" class="btn btn-success">Archive Return</button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

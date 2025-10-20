@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Institution Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Institution Details (ID: {{ institution.id }})</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Institution Information
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('institution_detail_update_delete', institution_id=institution.id) }}" method="POST">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Institution Name</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ institution.name }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="code" class="form-label">Institution Code</label>
+                    <input type="text" class="form-control" id="code" name="code" value="{{ institution.code }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="contact_email" class="form-label">Contact Email</label>
+                    <input type="email" class="form-control" id="contact_email" name="contact_email" value="{{ institution.contact_email }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-control" id="status" name="status" required>
+                        <option value="ACTIVE" {% if institution.status == 'ACTIVE' %}selected{% endif %}>ACTIVE</option>
+                        <option value="LOCKED" {% if institution.status == 'LOCKED' %}selected{% endif %}>LOCKED</option>
+                        <option value="SUSPENDED" {% if institution.status == 'SUSPENDED' %}selected{% endif %}>SUSPENDED</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Update Institution</button>
+            </form>
+        </div>
+    </div>
+
+    <a href="{{ url_for('institutions_list_create') }}" class="btn btn-secondary">Back to Institutions</a>
+    <button type="button" class="btn btn-danger" onclick="deleteInstitution('{{ institution.id }}')">Delete Institution</button>
+</div>
+
+<script>
+function deleteInstitution(institutionId) {
+    if (confirm('Are you sure you want to delete this institution? This action cannot be undone.')) {
+        fetch(`/institutions/${institutionId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+                window.location.href = "{{ url_for('institutions_list_create') }}";
+            } else if (data.error) {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the institution.');
+        });
+    }
+}
+</script>
+{% endblock %}

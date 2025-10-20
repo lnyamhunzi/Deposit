@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Surveillance CAMELS Ratings{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Surveillance CAMELS Ratings for Period ID: {{ period_id }}</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Create New CAMELS Rating
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('surveillance_camels_ratings_list_create', period_id=period_id) }}" method="POST">
+                <div class="mb-3">
+                    <label for="capital_adequacy" class="form-label">Capital Adequacy (1-5)</label>
+                    <input type="number" step="0.01" min="1" max="5" class="form-control" id="capital_adequacy" name="capital_adequacy" required>
+                </div>
+                <div class="mb-3">
+                    <label for="asset_quality" class="form-label">Asset Quality (1-5)</label>
+                    <input type="number" step="0.01" min="1" max="5" class="form-control" id="asset_quality" name="asset_quality" required>
+                </div>
+                <div class="mb-3">
+                    <label for="management_quality" class="form-label">Management Quality (1-5)</label>
+                    <input type="number" step="0.01" min="1" max="5" class="form-control" id="management_quality" name="management_quality" required>
+                </div>
+                <div class="mb-3">
+                    <label for="earnings" class="form-label">Earnings (1-5)</label>
+                    <input type="number" step="0.01" min="1" max="5" class="form-control" id="earnings" name="earnings" required>
+                </div>
+                <div class="mb-3">
+                    <label for="liquidity" class="form-label">Liquidity (1-5)</label>
+                    <input type="number" step="0.01" min="1" max="5" class="form-control" id="liquidity" name="liquidity" required>
+                </div>
+                <div class="mb-3">
+                    <label for="sensitivity" class="form-label">Sensitivity (1-5)</label>
+                    <input type="number" step="0.01" min="1" max="5" class="form-control" id="sensitivity" name="sensitivity" required>
+                </div>
+                <div class="mb-3">
+                    <label for="composite_rating" class="form-label">Composite Rating</label>
+                    <input type="number" step="0.01" class="form-control" id="composite_rating" name="composite_rating" required>
+                </div>
+                <div class="mb-3">
+                    <label for="risk_grade" class="form-label">Risk Grade (A, B, C, D, E)</label>
+                    <input type="text" class="form-control" id="risk_grade" name="risk_grade" required>
+                </div>
+                <div class="mb-3">
+                    <label for="rating_date" class="form-label">Rating Date</label>
+                    <input type="date" class="form-control" id="rating_date" name="rating_date" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Create Rating</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            Existing CAMELS Ratings
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Capital</th>
+                        <th>Asset</th>
+                        <th>Management</th>
+                        <th>Earnings</th>
+                        <th>Liquidity</th>
+                        <th>Sensitivity</th>
+                        <th>Composite</th>
+                        <th>Risk Grade</th>
+                        <th>Rating Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rating in ratings %}
+                    <tr>
+                        <td>{{ rating.id }}</td>
+                        <td>{{ "%.2f"|format(rating.capital_adequacy) }}</td>
+                        <td>{{ "%.2f"|format(rating.asset_quality) }}</td>
+                        <td>{{ "%.2f"|format(rating.management_quality) }}</td>
+                        <td>{{ "%.2f"|format(rating.earnings) }}</td>
+                        <td>{{ "%.2f"|format(rating.liquidity) }}</td>
+                        <td>{{ "%.2f"|format(rating.sensitivity) }}</td>
+                        <td>{{ "%.2f"|format(rating.composite_rating) }}</td>
+                        <td>{{ rating.risk_grade }}</td>
+                        <td>{{ rating.rating_date.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <a href="{{ url_for('surveillance_camels_rating_detail', rating_id=rating.id) }}" class="btn btn-sm btn-info">View Details</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Invoice Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Invoice Details (ID: {{ invoice.id }})</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Invoice Information
+        </div>
+        <div class="card-body">
+            <p><strong>Invoice Number:</strong> {{ invoice.invoice_number }}</p>
+            <p><strong>Institution:</strong> {{ invoice.institution.name }} ({{ invoice.institution.code }})</p>
+            <p><strong>Premium Calculation ID:</strong> {{ invoice.premium_calculation_id }}</p>
+            <p><strong>Invoice Date:</strong> {{ invoice.invoice_date.strftime('%Y-%m-%d') }}</p>
+            <p><strong>Due Date:</strong> {{ invoice.due_date.strftime('%Y-%m-%d') }}</p>
+            <p><strong>Amount:</strong> ${{ "%.2f"|format(invoice.amount) }}</p>
+            <p><strong>Tax Amount:</strong> ${{ "%.2f"|format(invoice.tax_amount) }}</p>
+            <p><strong>Total Amount:</strong> ${{ "%.2f"|format(invoice.total_amount) }}</p>
+            <p><strong>Status:</strong> <span class="badge bg-{{ 'success' if invoice.status == 'PAID' else 'warning' if invoice.status == 'INVOICED' else 'danger' }}">{{ invoice.status }}</span></p>
+            <p><strong>Sent to Accounting:</strong> {{ "Yes" if invoice.sent_to_accounting else "No" }}</p>
+            <p><strong>Accounting Reference:</strong> {{ invoice.accounting_reference if invoice.accounting_reference else 'N/A' }}</p>
+            <p><strong>Paid Amount:</strong> ${{ "%.2f"|format(invoice.paid_amount) }}</p>
+            <p><strong>Paid At:</strong> {{ invoice.paid_at.strftime('%Y-%m-%d %H:%M:%S') if invoice.paid_at else 'N/A' }}</p>
+            <p><strong>Payment Reference:</strong> {{ invoice.payment_reference if invoice.payment_reference else 'N/A' }}</p>
+            <p><strong>Created At:</strong> {{ invoice.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+            <p><strong>Updated At:</strong> {{ invoice.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        </div>
+    </div>
+
+    <a href="{{ url_for('invoices_list') }}" class="btn btn-secondary">Back to Invoices</a>
+</div>
+{% endblock %}

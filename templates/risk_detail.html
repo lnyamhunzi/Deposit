@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Risk Assessment Details - Q-Sight{% endblock %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3"><i class="fas fa-exclamation-triangle me-2"></i>Risk Assessment Details</h2>
+        <h4>{{ risk_score.bank.bank_name }} - {{ risk_score.assessment_period }}</h4>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-label">Alert Level</div>
+            <div class="stat-number"><span class="badge alert-{{ risk_score.alert_level.lower() }} fs-1">{{ risk_score.alert_level }}</span></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-label">Risk Category</div>
+            <div class="stat-number text-primary fs-5">{{ risk_score.risk_category }}</div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6"><div class="card"><div class="card-header"><h6 class="mb-0">Risk Scores</h6></div><div class="card-body">
+        <p><strong>Overall Risk:</strong> {{ "%.2f"|format(risk_score.overall_risk_score) }}</p>
+        <p><strong>Credit Risk:</strong> {{ "%.2f"|format(risk_score.credit_risk_score) }}</p>
+        <p><strong>Market Risk:</strong> {{ "%.2f"|format(risk_score.market_risk_score) }}</p>
+        <p><strong>Operational Risk:</strong> {{ "%.2f"|format(risk_score.operational_risk_score) }}</p>
+        <p><strong>Liquidity Risk:</strong> {{ "%.2f"|format(risk_score.liquidity_risk_score) }}</p>
+    </div></div></div>
+    <div class="col-md-6"><div class="card"><div class="card-header"><h6 class="mb-0">ML Predictions</h6></div><div class="card-body">
+        <p><strong>Failure Probability:</strong> {{ "%.4f"|format(risk_score.ml_failure_probability) }}%</p>
+        <p><strong>Anomaly Score:</strong> {{ "%.4f"|format(risk_score.anomaly_score) }}</p>
+        <p><strong>PD:</strong> {{ "%.6f"|format(risk_score.probability_of_default) }}</p>
+        <p><strong>LGD:</strong> {{ "%.6f"|format(risk_score.loss_given_default) }}</p>
+        <p><strong>Expected Loss:</strong> ${{ "{:,.2f}".format(risk_score.expected_loss) }}</p>
+    </div></div></div>
+</div>
+{% endblock %}

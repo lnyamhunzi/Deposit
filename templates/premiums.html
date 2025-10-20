@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Premiums - Q-Sight{% endblock %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3"><i class="fas fa-dollar-sign me-2"></i>Premium Management</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0">Premium Records</h5></div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="premiumsTable">
+                        <thead>
+                            <tr><th>Bank</th><th>Period</th><th>Method</th><th>Eligible Deposits</th><th>Premium Amount</th><th>Invoice #</th><th>Status</th><th>Due Date</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for premium in premiums %}
+                            <tr>
+                                <td><strong>{{ premium.bank.bank_name }}</strong></td>
+                                <td>{{ premium.period }}</td>
+                                <td>{{ premium.calculation_method }}</td>
+                                <td>${{ "{:,.2f}".format(premium.eligible_deposits) if premium.eligible_deposits else '0.00' }}</td>
+                                <td>${{ "{:,.2f}".format(premium.total_premium) if premium.total_premium else '0.00' }}</td>
+                                <td>{{ premium.invoice_number }}</td>
+                                <td><span class="badge bg-{{ 'success' if premium.payment_status == 'Paid' else 'warning' }}">{{ premium.payment_status }}</span></td>
+                                <td>{{ premium.due_date.strftime('%Y-%m-%d') if premium.due_date else 'N/A' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>$(document).ready(function() { $('#premiumsTable').DataTable({pageLength: 25}); });</script>
+{% endblock %}

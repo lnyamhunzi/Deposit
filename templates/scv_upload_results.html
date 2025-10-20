@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}SCV Upload Results{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">SCV Upload Results for {{ upload.file_name }}</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Upload Details
+        </div>
+        <div class="card-body">
+            <p><strong>Upload ID:</strong> {{ upload.id }}</p>
+            <p><strong>Institution ID:</strong> {{ upload.institution_id }}</p>
+            <p><strong>Period ID:</strong> {{ upload.period_id }}</p>
+            <p><strong>File Name:</strong> {{ upload.file_name }}</p>
+            <p><strong>Status:</strong> <span class="badge bg-{{ 'success' if upload.status == 'COMPLETED' else 'warning' if upload.status == 'VALIDATED' else 'danger' }}">{{ upload.status }}</span></p>
+            <p><strong>Uploaded At:</strong> {{ upload.uploaded_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+            <p><strong>Processed At:</strong> {{ upload.processed_at.strftime('%Y-%m-%d %H:%M:%S') if upload.processed_at else 'N/A' }}</p>
+            <p><strong>Total Records:</strong> {{ upload.total_records }}</p>
+            <p><strong>Processed Records:</strong> {{ upload.processed_records }}</p>
+        </div>
+    </div>
+
+    {% if validation_results %}
+    <div class="card mb-4">
+        <div class="card-header">
+            Validation Results
+        </div>
+        <div class="card-body">
+            {% if upload.validation_errors %}
+                <div class="alert alert-danger">
+                    <h5>Validation Failures:</h5>
+                    <ul>
+                        {% for error in upload.validation_errors %}
+                            <li><strong>{{ error.test_name }}:</strong> {{ error.message }} (Details: {{ error.details }})</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% else %}
+                <div class="alert alert-success">No validation errors found.</div>
+            {% endif %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Test Name</th>
+                        <th>Status</th>
+                        <th>Message</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in validation_results %}
+                    <tr>
+                        <td>{{ result.test_name }}</td>
+                        <td><span class="badge bg-{{ 'success' if result.status == 'PASS' else 'danger' if result.status == 'FAIL' else 'warning' }}">{{ result.status }}</span></td>
+                        <td>{{ result.message }}</td>
+                        <td>{{ result.details }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if consolidation_result %}
+    <div class="card mb-4">
+        <div class="card-header">
+            Consolidation Results
+        </div>
+        <div class="card-body">
+            {% if consolidation_result.success %}
+                <div class="alert alert-success">
+                    <p>Consolidation successful!</p>
+                    <p><strong>Total Records Processed:</strong> {{ consolidation_result.processed_records }}</p>
+                    <p><strong>Processing Time:</strong> {{ consolidation_result.processing_time }}</p>
+                </div>
+            {% else %}
+                <div class="alert alert-danger">
+                    <p>Consolidation failed!</p>
+                    <p><strong>Error:</strong> {{ consolidation_result.error }}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <a href="{{ url_for('scv_list') }}" class="btn btn-secondary">Back to SCV List</a>
+</div>
+{% endblock %}

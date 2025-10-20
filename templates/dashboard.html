@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Q-Sight{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3"><i class="fas fa-tachometer-alt me-2"></i>Regulatory Dashboard</h2>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="stat-card">
+            <div class="stat-label">Active Banks</div>
+            <div class="stat-number">{{ stats.total_banks }}</div>
+            <div class="small text-muted mt-2">
+                <i class="fas fa-university me-1"></i>Monitored Institutions
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="stat-card">
+            <div class="stat-label">Banks at Risk</div>
+            <div class="stat-number text-danger">{{ stats.banks_at_risk }}</div>
+            <div class="small text-muted mt-2">
+                <i class="fas fa-exclamation-triangle me-1"></i>CAMELS Rating ≥ 4
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="stat-card">
+            <div class="stat-label">Total Returns</div>
+            <div class="stat-number text-primary">{{ stats.total_returns }}</div>
+            <div class="small text-muted mt-2">
+                <i class="fas fa-file-alt me-1"></i>{{ stats.pending_returns }} Pending
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="stat-card">
+            <div class="stat-label">Unpaid Premiums</div>
+            <div class="stat-number text-warning">{{ stats.unpaid_premiums }}</div>
+            <div class="small text-muted mt-2">
+                <i class="fas fa-dollar-sign me-1"></i>Of {{ stats.total_premiums }} Total
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-8 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Recent CAMELS Ratings</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="camelsTable">
+                        <thead>
+                            <tr>
+                                <th>Bank</th>
+                                <th>Period</th>
+                                <th>C</th>
+                                <th>A</th>
+                                <th>M</th>
+                                <th>E</th>
+                                <th>L</th>
+                                <th>S</th>
+                                <th>Composite</th>
+                                <th>Risk Level</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rating in latest_camels %}
+                            <tr>
+                                <td><strong>{{ rating.bank.bank_name }}</strong></td>
+                                <td>{{ rating.rating_period }}</td>
+                                <td><span class="badge rating-{{ rating.capital_rating }}">{{ rating.capital_rating }}</span></td>
+                                <td><span class="badge rating-{{ rating.asset_quality_rating }}">{{ rating.asset_quality_rating }}</span></td>
+                                <td><span class="badge rating-{{ rating.management_rating }}">{{ rating.management_rating }}</span></td>
+                                <td><span class="badge rating-{{ rating.earnings_rating }}">{{ rating.earnings_rating }}</span></td>
+                                <td><span class="badge rating-{{ rating.liquidity_rating }}">{{ rating.liquidity_rating }}</span></td>
+                                <td><span class="badge rating-{{ rating.sensitivity_rating }}">{{ rating.sensitivity_rating }}</span></td>
+                                <td><span class="badge rating-{{ rating.composite_rating }}">{{ rating.composite_rating }}</span></td>
+                                <td>{{ rating.risk_level }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-exclamation-circle me-2"></i>Risk Alerts</h5>
+            </div>
+            <div class="card-body">
+                {% for risk in risk_scores[:5] %}
+                <div class="alert alert-{{ risk.alert_level.lower() if risk.alert_level else 'green' }} text-white mb-2">
+                    <div class="fw-bold">{{ risk.bank.bank_name }}</div>
+                    <small>{{ risk.risk_category }} - Alert: {{ risk.alert_level }}</small>
+                    <div class="small mt-1">Risk Score: {{ "%.2f"|format(risk.overall_risk_score) }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Recent Returns Submissions</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="returnsTable">
+                        <thead>
+                            <tr>
+                                <th>Bank</th>
+                                <th>Period</th>
+                                <th>Type</th>
+                                <th>Submission Date</th>
+                                <th>Total Deposits</th>
+                                <th>Accounts</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ret in recent_returns %}
+                            <tr>
+                                <td><strong>{{ ret.bank.bank_name }}</strong></td>
+                                <td>{{ ret.return_period }}</td>
+                                <td>{{ ret.return_type }}</td>
+                                <td>{{ ret.submission_date.strftime('%Y-%m-%d') if ret.submission_date else 'N/A' }}</td>
+                                <td>${{ "{:,.2f}".format(ret.total_deposits) if ret.total_deposits else '0.00' }}</td>
+                                <td>{{ "{:,}".format(ret.total_accounts) if ret.total_accounts else '0' }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if ret.status == 'Validated' else 'warning' }}">
+                                        {{ ret.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Returns Submission Trend</h5>
+            </div>
+            <div class="card-body">
+                <div id="returnsTrendChart" style="height: 400px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<div class="row mt-4">
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>CAMELS Composite Rating Trend</h5>
+            </div>
+            <div class="card-body">
+                <div id="camelsTrendChart" style="height: 400px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Risk Score Trend</h5>
+            </div>
+            <div class="card-body">
+                <div id="riskScoreTrendChart" style="height: 400px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Cross-Institution Comparison</h5>
+            </div>
+            <div class="card-body">
+                <div id="comparisonChart" style="height: 400px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#camelsTable').DataTable({
+        pageLength: 5,
+        order: [[1, 'desc']]
+    });
+    
+    $('#returnsTable').DataTable({
+        pageLength: 5,
+        order: [[3, 'desc']]
+    });
+    
+    // CAMELS Distribution Chart (existing)
+    var compositeRatings = {{ latest_camels | map(attribute='composite_rating') | list | tojson }};
+    var ratingCounts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
+    compositeRatings.forEach(function(rating) {
+        ratingCounts[rating] = (ratingCounts[rating] || 0) + 1;
+    });
+    
+    var pieData = [{
+        values: Object.values(ratingCounts),
+        labels: ['Rating 1 (Strong)', 'Rating 2 (Satisfactory)', 'Rating 3 (Fair)', 'Rating 4 (Marginal)', 'Rating 5 (Unsatisfactory)'],
+        type: 'pie',
+        marker: {
+            colors: ['#10b981', '#3b82f6', '#f59e0b', '#f97316', '#ef4444']
+        }
+    }];
+    
+    var pieLayout = {
+        height: 400,
+        showlegend: true,
+        legend: {
+            orientation: 'h',
+            y: -0.2
+        }
+    };
+    
+    Plotly.newPlot('camelsDistribution', pieData, pieLayout);
+
+    // Returns Submission Trend Chart (existing)
+    var returnsTrendData = [{
+        x: {{ returns_chart_data.dates | tojson }},
+        y: {{ returns_chart_data.counts | tojson }},
+        type: 'scatter',
+        mode: 'lines+markers',
+        marker: { color: '#3b82f6' }
+    }];
+
+    var returnsTrendLayout = {
+        title: 'Daily Returns Submissions',
+        height: 400,
+        xaxis: { title: 'Date' },
+        yaxis: { title: 'Number of Returns' }
+    };
+
+    Plotly.newPlot('returnsTrendChart', returnsTrendData, returnsTrendLayout);
+
+    // Historical CAMELS Trend Chart
+    var historicalCamels = {{ historical_camels | tojson }};
+    var camelsTrendTraces = [];
+    var institutions = {};
+
+    historicalCamels.forEach(function(d) {
+        if (!institutions[d.institution.name]) {
+            institutions[d.institution.name] = {
+                dates: [],
+                composite_ratings: []
+            };
+        }
+        institutions[d.institution.name].dates.push(d.calculated_at);
+        institutions[d.institution.name].composite_ratings.push(d.composite_rating);
+    });
+
+    for (var instName in institutions) {
+        camelsTrendTraces.push({
+            x: institutions[instName].dates,
+            y: institutions[instName].composite_ratings,
+            mode: 'lines+markers',
+            name: instName
+        });
+    }
+
+    var camelsTrendLayout = {
+        title: 'Historical CAMELS Composite Ratings',
+        xaxis: { title: 'Date' },
+        yaxis: { title: 'Composite Rating (1=Best, 5=Worst)', autorange: 'reversed' }
+    };
+
+    Plotly.newPlot('camelsTrendChart', camelsTrendTraces, camelsTrendLayout);
+
+    // Historical Risk Score Trend Chart
+    var historicalRiskScores = {{ historical_risk_scores | tojson }};
+    var riskScoreTrendTraces = [];
+    var riskInstitutions = {};
+
+    historicalRiskScores.forEach(function(d) {
+        if (!riskInstitutions[d.institution.name]) {
+            riskInstitutions[d.institution.name] = {
+                dates: [],
+                composite_scores: []
+            };
+        }
+        riskInstitutions[d.institution.name].dates.push(d.calculated_at);
+        riskInstitutions[d.institution.name].composite_scores.push(d.composite_score);
+    });
+
+    for (var instName in riskInstitutions) {
+        riskScoreTrendTraces.push({
+            x: riskInstitutions[instName].dates,
+            y: riskInstitutions[instName].composite_scores,
+            mode: 'lines+markers',
+            name: instName
+        });
+    }
+
+    var riskScoreTrendLayout = {
+        title: 'Historical Risk Scores',
+        xaxis: { title: 'Date' },
+        yaxis: { title: 'Composite Risk Score' }
+    };
+
+    Plotly.newPlot('riskScoreTrendChart', riskScoreTrendTraces, riskScoreTrendLayout);
+
+    // Cross-Institution Comparison Chart
+    var comparisonData = {{ comparison_data | tojson }};
+    var instNames = comparisonData.map(d => d.institution_name);
+    var camelsComposites = comparisonData.map(d => d.latest_camels_composite);
+    var riskScores = comparisonData.map(d => d.latest_risk_score);
+
+    var comparisonTraces = [
+        {
+            x: instNames,
+            y: camelsComposites,
+            type: 'bar',
+            name: 'Latest CAMELS Composite',
+            marker: { color: '#4CAF50' }
+        },
+        {
+            x: instNames,
+            y: riskScores,
+            type: 'bar',
+            name: 'Latest Risk Score',
+            marker: { color: '#FFC107' }
+        }
+    ];
+
+    var comparisonLayout = {
+        title: 'Cross-Institution Comparison (Latest Data)',
+        barmode: 'group',
+        xaxis: { title: 'Institution' },
+        yaxis: { title: 'Score' }
+    };
+
+    Plotly.newPlot('comparisonChart', comparisonTraces, comparisonLayout);
+
+    // Highlight outliers in Risk Alerts (if any)
+    var camelsOutliers = {{ camels_outliers | tojson }};
+    if (camelsOutliers.length > 0) {
+        var outlierHtml = '<div class="card-header"><h5 class="mb-0 text-danger"><i class="fas fa-exclamation-triangle me-2"></i>CAMELS Outliers</h5></div><div class="card-body">';
+        camelsOutliers.forEach(function(outlier) {
+            outlierHtml += '<div class="alert alert-danger text-white mb-2">';
+            outlierHtml += '<div class="fw-bold">' + outlier.bank_name + '</div>';
+            outlierHtml += '<small>Composite Rating: ' + outlier.composite_rating + ' on ' + outlier.calculated_at + '</small>';
+            outlierHtml += '</div>';
+        });
+        outlierHtml += '</div>';
+        // Replace the existing Risk Alerts card with a dedicated Outliers card
+        $('.col-lg-4 .card').first().html(outlierHtml);
+    }
+});
+</script>
+{% endblock %}

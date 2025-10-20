@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Validation Results{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Validation Results for Upload ID: {{ validation_results[0].upload_id if validation_results else 'N/A' }}</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if validation_results %}
+    <div class="card mb-4">
+        <div class="card-header">
+            Detailed Validation Results
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Test Name</th>
+                        <th>Test Type</th>
+                        <th>Status</th>
+                        <th>Message</th>
+                        <th>Details</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in validation_results %}
+                    <tr>
+                        <td>{{ result.test_name }}</td>
+                        <td>{{ result.test_type }}</td>
+                        <td><span class="badge bg-{{ 'success' if result.status == 'PASS' else 'danger' if result.status == 'FAIL' else 'warning' }}">{{ result.status }}</span></td>
+                        <td>{{ result.message }}</td>
+                        <td>{{ result.details }}</td>
+                        <td>{{ result.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">No validation results found for this upload.</div>
+    {% endif %}
+
+    <a href="{{ url_for('return_upload_details', upload_id=validation_results[0].upload_id if validation_results else '') }}" class="btn btn-secondary">Back to Upload Details</a>
+</div>
+{% endblock %}

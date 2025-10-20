@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Payments{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Payments</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Record New Payment
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('payments_list_create') }}" method="POST">
+                <div class="mb-3">
+                    <label for="invoice_id" class="form-label">Invoice</label>
+                    <select class="form-control" id="invoice_id" name="invoice_id" required>
+                        <option value="">Select Invoice</option>
+                        {% for invoice in invoices %}
+                            <option value="{{ invoice.id }}">Invoice #{{ invoice.invoice_number }} ({{ invoice.institution.name }}) - ${{ "%.2f"|format(invoice.total_amount) }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="institution_id" class="form-label">Institution</label>
+                    <select class="form-control" id="institution_id" name="institution_id" required>
+                        <option value="">Select Institution</option>
+                        {% for bank in banks %}
+                            <option value="{{ bank.id }}">{{ bank.name }} ({{ bank.code }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Amount</label>
+                    <input type="number" step="0.01" class="form-control" id="amount" name="amount" required>
+                </div>
+                <div class="mb-3">
+                    <label for="payment_date" class="form-label">Payment Date</label>
+                    <input type="date" class="form-control" id="payment_date" name="payment_date" required>
+                </div>
+                <div class="mb-3">
+                    <label for="payment_method" class="form-label">Payment Method</label>
+                    <input type="text" class="form-control" id="payment_method" name="payment_method" required>
+                </div>
+                <div class="mb-3">
+                    <label for="payment_reference" class="form-label">Payment Reference</label>
+                    <input type="text" class="form-control" id="payment_reference" name="payment_reference" required>
+                </div>
+                <div class="mb-3">
+                    <label for="bank_reference" class="form-label">Bank Reference</label>
+                    <input type="text" class="form-control" id="bank_reference" name="bank_reference">
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="proof_verified" name="proof_verified">
+                    <label class="form-check-label" for="proof_verified">Proof Verified</label>
+                </div>
+                <div class="mb-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-control" id="status" name="status" required>
+                        {% for status_enum in PaymentStatus %}
+                            <option value="{{ status_enum.value }}">{{ status_enum.value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Record Payment</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            Existing Payments
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Invoice #</th>
+                        <th>Institution</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Method</th>
+                        <th>Reference</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                    <tr>
+                        <td>{{ payment.id }}</td>
+                        <td>{{ payment.invoice.invoice_number }}</td>
+                        <td>{{ payment.institution.name }}</td>
+                        <td>${{ "%.2f"|format(payment.amount) }}</td>
+                        <td>{{ payment.payment_date.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ payment.payment_method }}</td>
+                        <td>{{ payment.payment_reference }}</td>
+                        <td><span class="badge bg-{{ 'success' if payment.status == 'VERIFIED' else 'warning' if payment.status == 'PENDING' else 'danger' }}">{{ payment.status }}</span></td>
+                        <td>
+                            <a href="{{ url_for('payment_detail', payment_id=payment.id) }}" class="btn btn-sm btn-info">View Details</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Early Warning Signals{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Early Warning Signals</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Create New Early Warning Signal
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('early_warning_signals_list_create') }}" method="POST">
+                <div class="mb-3">
+                    <label for="institution_id" class="form-label">Institution</label>
+                    <select class="form-control" id="institution_id" name="institution_id" required>
+                        <option value="">Select Institution</option>
+                        {% for bank in banks %}
+                            <option value="{{ bank.id }}">{{ bank.name }} ({{ bank.code }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="signal_type" class="form-label">Signal Type</label>
+                    <input type="text" class="form-control" id="signal_type" name="signal_type" required>
+                </div>
+                <div class="mb-3">
+                    <label for="severity" class="form-label">Severity</label>
+                    <select class="form-control" id="severity" name="severity" required>
+                        <option value="LOW">LOW</option>
+                        <option value="MEDIUM">MEDIUM</option>
+                        <option value="HIGH">HIGH</option>
+                        <option value="CRITICAL">CRITICAL</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="triggered_at" class="form-label">Triggered At</label>
+                    <input type="date" class="form-control" id="triggered_at" name="triggered_at" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Create Signal</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            Existing Early Warning Signals
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Institution</th>
+                        <th>Type</th>
+                        <th>Severity</th>
+                        <th>Description</th>
+                        <th>Triggered At</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for signal in signals %}
+                    <tr>
+                        <td>{{ signal.id }}</td>
+                        <td>{{ signal.institution.name }}</td>
+                        <td>{{ signal.signal_type }}</td>
+                        <td><span class="badge bg-{{ 'danger' if signal.severity == 'CRITICAL' else 'warning' if signal.severity == 'HIGH' else 'info' }}">{{ signal.severity }}</span></td>
+                        <td>{{ signal.description }}</td>
+                        <td>{{ signal.triggered_at.strftime('%Y-%m-%d') }}</td>
+                        <td><span class="badge bg-{{ 'success' if signal.status == 'RESOLVED' else 'danger' if signal.status == 'ACTIVE' else 'info' }}">{{ signal.status }}</span></td>
+                        <td>
+                            <a href="{{ url_for('early_warning_signal_detail_update', signal_id=signal.id) }}" class="btn btn-sm btn-info">View/Edit</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

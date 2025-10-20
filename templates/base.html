@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Q-Sight Regulatory System{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-navy: #1e3a5f;
+            --secondary-slate: #475569;
+            --accent-blue: #3b82f6;
+            --bg-light: #f8fafc;
+            --text-dark: #1e293b;
+            --border-color: #e2e8f0;
+            --success-green: #10b981;
+            --warning-amber: #f59e0b;
+            --danger-red: #ef4444;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, var(--secondary-slate) 100%);
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white !important;
+            letter-spacing: -0.5px;
+        }
+        
+        .navbar-nav .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+            margin: 0 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: white !important;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+        
+        .content-wrapper {
+            padding: 2rem 0;
+            min-height: calc(100vh - 200px);
+        }
+        
+        .card {
+            border: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, var(--secondary-slate) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px 8px 0 0 !important;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-navy);
+        }
+        
+        .stat-label {
+            color: var(--secondary-slate);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary {
+            background: var(--accent-blue);
+            border: none;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .badge {
+            padding: 0.4rem 0.8rem;
+            font-weight: 500;
+        }
+        
+        .rating-1 { background-color: var(--success-green); }
+        .rating-2 { background-color: #3b82f6; }
+        .rating-3 { background-color: var(--warning-amber); }
+        .rating-4 { background-color: #f97316; }
+        .rating-5 { background-color: var(--danger-red); }
+        
+        .alert-green { background-color: var(--success-green); }
+        .alert-yellow { background-color: var(--warning-amber); }
+        .alert-amber { background-color: #f97316; }
+        .alert-red { background-color: var(--danger-red); }
+        
+        footer {
+            background: var(--primary-navy);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .table {
+            background: white;
+        }
+        
+        .table thead {
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<style>
+    body {
+        display: flex;
+        min-height: 100vh;
+        flex-direction: column;
+    }
+    .main-wrapper {
+        display: flex;
+        flex-grow: 1;
+    }
+    .sidebar {
+        width: 280px;
+        background: linear-gradient(135deg, var(--primary-navy) 0%, var(--secondary-slate) 100%);
+        color: white;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+    }
+    .sidebar .navbar-brand {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: white !important;
+        letter-spacing: -0.5px;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    .sidebar .nav-link {
+        color: rgba(255,255,255,0.9) !important;
+        font-weight: 500;
+        margin: 0.25rem 0;
+        transition: all 0.3s;
+        border-radius: 4px;
+        padding: 0.75rem 1rem;
+    }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active {
+        color: white !important;
+        background-color: rgba(255,255,255,0.1);
+    }
+    .content-wrapper {
+        flex-grow: 1;
+        padding: 2rem;
+        background-color: var(--bg-light);
+    }
+    footer {
+        background: var(--primary-navy);
+        color: white;
+        padding: 1rem 0;
+        text-align: center;
+    }
+</style>
+<body>
+    <div class="main-wrapper">
+        {% if request.state.user and request.state.user.is_authenticated %}
+        <div class="sidebar">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-shield-alt me-2"></i>Q-Sight
+            </a>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/banks"><i class="fas fa-university me-2"></i>Banks</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/returns"><i class="fas fa-file-upload me-2"></i>Returns</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/camels"><i class="fas fa-chart-bar me-2"></i>CAMELS</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/risk-analysis"><i class="fas fa-exclamation-triangle me-2"></i>Risk Analysis</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/premiums"><i class="fas fa-dollar-sign me-2"></i>Premiums</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/surveillance"><i class="fas fa-eye me-2"></i>Surveillance</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/single-customer-view"><i class="fas fa-users me-2"></i>SCV</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+                </li>
+            </ul>
+            <div class="mt-auto">
+                <p class="small mb-0">Version 1.0.0</p>
+                <p class="small">&copy; 2025 Mugonat Systems</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="content-wrapper">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Set active class on sidebar link
+            var currentPath = window.location.pathname;
+            $('.sidebar .nav-link').each(function() {
+                var linkPath = $(this).attr('href');
+                if (currentPath === linkPath) {
+                    $(this).addClass('active');
+                }
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

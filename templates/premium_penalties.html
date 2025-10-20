@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Premium Penalties{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Premium Penalties</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card">
+        <div class="card-header">
+            Existing Premium Penalties
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Invoice #</th>
+                        <th>Institution</th>
+                        <th>Type</th>
+                        <th>Original Amount</th>
+                        <th>Penalty Amount</th>
+                        <th>Total Amount</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for penalty in penalties %}
+                    <tr>
+                        <td>{{ penalty.id }}</td>
+                        <td>{{ penalty.invoice.invoice_number }}</td>
+                        <td>{{ penalty.institution.name }}</td>
+                        <td>{{ penalty.penalty_type }}</td>
+                        <td>${{ "%.2f"|format(penalty.original_amount) }}</td>
+                        <td>${{ "%.2f"|format(penalty.penalty_amount) }}</td>
+                        <td>${{ "%.2f"|format(penalty.total_amount) }}</td>
+                        <td>{{ penalty.due_date.strftime('%Y-%m-%d') }}</td>
+                        <td><span class="badge bg-info">{{ penalty.status }}</span></td>
+                        <td>
+                            <a href="{{ url_for('premium_penalty_detail', penalty_id=penalty.id) }}" class="btn btn-sm btn-info">View Details</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

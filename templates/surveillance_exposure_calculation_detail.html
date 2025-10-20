@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Exposure Calculation Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Exposure Calculation Details (ID: {{ calculation.id }})</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Calculation Information
+        </div>
+        <div class="card-body">
+            <p><strong>Period ID:</strong> {{ calculation.period_id }}</p>
+            <p><strong>Deposit Type:</strong> {{ calculation.deposit_type }}</p>
+            <p><strong>Total Deposits:</strong> ${{ "%.2f"|format(calculation.total_deposits) }}</p>
+            <p><strong>Insured Amount:</strong> ${{ "%.2f"|format(calculation.insured_amount) }}</p>
+            <p><strong>Uninsured Amount:</strong> ${{ "%.2f"|format(calculation.uninsured_amount) }}</p>
+            <p><strong>Cover Level:</strong> {{ "%.2f"|format(calculation.cover_level) }}%</p>
+            <p><strong>Exposure Percentage:</strong> {{ "%.2f"|format(calculation.exposure_percentage) }}%</p>
+            <p><strong>Concentration Risk:</strong> {{ "%.4f"|format(calculation.concentration_risk) }}</p>
+            <p><strong>Volatility Risk:</strong> {{ "%.4f"|format(calculation.volatility_risk) }}</p>
+            <p><strong>Created At:</strong> {{ calculation.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        </div>
+    </div>
+
+    <a href="{{ url_for('surveillance_exposure_calculations_list_create', period_id=calculation.period_id) }}" class="btn btn-secondary">Back to Exposure Calculations</a>
+</div>
+{% endblock %}

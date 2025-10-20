@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Validate Return - Q-Sight{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3"><i class="fas fa-clipboard-check me-2"></i>Validate Bank Return</h2>
+        <p><strong>Bank:</strong> {{ return_record.bank.bank_name }}</p>
+        <p><strong>Return Period:</strong> {{ return_record.return_period }}</p>
+        <p><strong>File:</strong> {{ return_record.file_name }}</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-{{ 'success' if validation_result.status == 'validated' else 'danger' }} text-white">
+                <h5 class="mb-0">Validation Result: {{ validation_result.status|upper }}</h5>
+            </div>
+            <div class="card-body">
+                {% if validation_result.errors %}
+                    <h6 class="text-danger">Errors Found:</h6>
+                    <ul>
+                        {% for error in validation_result.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-success">No errors found. The return is ready for submission.</p>
+                {% endif %}
+
+                {% if validation_result.warnings %}
+                    <h6 class="text-warning mt-4">Warnings:</h6>
+                    <ul>
+                        {% for warning in validation_result.warnings %}
+                            <li>{{ warning }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Control Totals</h5>
+            </div>
+            <div class="card-body">
+                {% set totals = validation_result.control_totals %}
+                <p><strong>Total Records:</strong> {{ totals.total_records | default(0) }}</p>
+                <p><strong>Total Balance:</strong> {{ "%.2f"|format(totals.total_balance|float) }}</p>
+                <p><strong>Individual Accounts:</strong> {{ totals.individual_accounts | default(0) }}</p>
+                <p><strong>Corporate Accounts:</strong> {{ totals.corporate_accounts | default(0) }}</p>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                {% if return_record.validation_status == 'validated' %}
+                    <form action="{{ url_for('submit_return', return_id=return_record.id) }}" method="POST">
+                        <button type="submit" class="btn btn-success w-100 mb-2">Confirm and Submit</button>
+                    </form>
+                {% endif %}
+                <a href="{{ url_for('upload_return') }}" class="btn btn-danger w-100">Discard and Re-upload</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

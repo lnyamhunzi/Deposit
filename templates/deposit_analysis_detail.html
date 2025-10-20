@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Deposit Analysis Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Deposit Analysis Details (ID: {{ analysis.id }})</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Analysis Information
+        </div>
+        <div class="card-body">
+            <p><strong>Period ID:</strong> {{ analysis.period_id }}</p>
+            <p><strong>Deposit Type:</strong> {{ analysis.deposit_type }}</p>
+            <p><strong>Total Deposits:</strong> ${{ "%.2f"|format(analysis.total_deposits) }}</p>
+            <p><strong>Total Accounts:</strong> {{ analysis.total_accounts }}</p>
+            <p><strong>Average Balance:</strong> ${{ "%.2f"|format(analysis.average_balance) }}</p>
+            <p><strong>Growth Rate:</strong> {{ "%.2f"|format(analysis.growth_rate) }}%</p>
+            <p><strong>Created At:</strong> {{ analysis.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        </div>
+    </div>
+
+    {% if analysis.currency_breakdown %}
+    <div class="card mb-4">
+        <div class="card-header">
+            Currency Breakdown
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                {% for currency, amount in analysis.currency_breakdown.items() %}
+                    <li class="list-group-item">{{ currency }}: ${{ "%.2f"|format(amount) }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if analysis.account_size_breakdown %}
+    <div class="card mb-4">
+        <div class="card-header">
+            Account Size Breakdown
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                {% for size, count in analysis.account_size_breakdown.items() %}
+                    <li class="list-group-item">{{ size }}: {{ count }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if analysis.product_breakdown %}
+    <div class="card mb-4">
+        <div class="card-header">
+            Product Breakdown
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                {% for product, amount in analysis.product_breakdown.items() %}
+                    <li class="list-group-item">{{ product }}: ${{ "%.2f"|format(amount) }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    <a href="{{ url_for('deposit_analyses_list_create', period_id=analysis.period_id) }}" class="btn btn-secondary">Back to Deposit Analyses</a>
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Deposit Register Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Deposit Register Details (ID: {{ register.id }})</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Register Summary
+        </div>
+        <div class="card-body">
+            <p><strong>Institution ID:</strong> {{ register.institution_id }}</p>
+            <p><strong>Period ID:</strong> {{ register.period_id }}</p>
+            <p><strong>Generated At:</strong> {{ register.generated_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+            <p><strong>Total Customers:</strong> {{ register.total_customers }}</p>
+            <p><strong>Total Accounts:</strong> {{ register.total_accounts }}</p>
+            <p><strong>Total Deposits:</strong> ${{ "%.2f"|format(register.total_deposits) }}</p>
+            <p><strong>Total Insured:</strong> ${{ "%.2f"|format(register.total_insured) }}</p>
+            <p><strong>Total Uninsured:</strong> ${{ "%.2f"|format(register.total_uninsured) }}</p>
+            <p><strong>Is Current:</strong> {{ "Yes" if register.is_current else "No" }}</p>
+            {% if register.register_file_path %}
+                <p><strong>Register File:</strong> <a href="{{ url_for('static', filename='deposit_registers/' + register.id + '/deposit_register.json') }}" target="_blank">View JSON</a></p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Breakdowns
+        </div>
+        <div class="card-body">
+            <h5>Account Type Breakdown:</h5>
+            <ul class="list-group mb-3">
+                {% for type, count in register.account_type_breakdown.items() %}
+                    <li class="list-group-item">{{ type }}: {{ count }}</li>
+                {% endfor %}
+            </ul>
+
+            <h5>Currency Breakdown:</h5>
+            <ul class="list-group mb-3">
+                {% for currency, amount in register.currency_breakdown.items() %}
+                    <li class="list-group-item">{{ currency }}: ${{ "%.2f"|format(amount) }}</li>
+                {% endfor %}
+            </ul>
+
+            <h5>Customer Type Breakdown:</h5>
+            <ul class="list-group mb-3">
+                {% for type, count in register.customer_type_breakdown.items() %}
+                    <li class="list-group-item">{{ type }}: {{ count }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <a href="{{ url_for('scv_list') }}" class="btn btn-secondary">Back to SCV List</a>
+        <a href="{{ url_for('export_register', register_id=register.id, format='PDF') }}" class="btn btn-info">Export as PDF</a>
+        <a href="{{ url_for('export_register', register_id=register.id, format='CSV') }}" class="btn btn-info">Export as CSV</a>
+    </div>
+</div>
+{% endblock %}

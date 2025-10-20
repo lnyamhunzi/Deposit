@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block extra_css %}
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        overflow: hidden; /* Prevent scrollbars from showing up */
+    }
+    body {
+        background-image: url("/static/Logo.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    .login-container {
+        height: 100vh; /* Full viewport height */
+        display: flex;
+        align-items: center;
+        justify-content: flex-end; /* Push content to the right */
+        padding: 0;
+    }
+    .login-form-wrapper {
+        width: 33.33%; /* Approximately 1/3 of the page width */
+        height: 100vh; /* Take full height */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background for the form */
+        padding: 2rem;
+        box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+    }
+    .card {
+        width: 100%;
+        border: none;
+        box-shadow: none;
+    }
+    /* Adjust for smaller screens */
+    @media (max-width: 767.98px) {
+        .login-container {
+            justify-content: center; /* Center content on small screens */
+            padding: 2rem 0;
+            height: auto;
+        }
+        .login-form-wrapper {
+            width: 90%; /* Wider form on small screens */
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        body {
+            background-attachment: scroll; /* Allow background to scroll on small screens */
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid login-container">
+    <div class="login-form-wrapper">
+        <div class="card">
+            <div class="card-header text-center bg-primary text-white">
+                <h3 class="mb-0">Login</h3>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(request, with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                <form action="{{ url_for('login') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                </form>
+                {% with messages = get_flashed_messages(request, with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} mt-3">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

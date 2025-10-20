@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}{{ bank.bank_name }} - Q-Sight{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3"><i class="fas fa-university me-2"></i>{{ bank.bank_name }}</h2>
+        <p class="text-muted">Bank Code: {{ bank.bank_code }}</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Bank Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Type:</strong> {{ bank.bank_type or 'N/A' }}</p>
+                <p><strong>Status:</strong> <span class="badge bg-{{ 'success' if bank.status == 'Active' else 'secondary' }}">{{ bank.status }}</span></p>
+                <p><strong>Contact Person:</strong> {{ bank.contact_person or 'N/A' }}</p>
+                <p><strong>Email:</strong> {{ bank.email or 'N/A' }}</p>
+                <p><strong>Phone:</strong> {{ bank.phone or 'N/A' }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Latest CAMELS Rating</h5>
+            </div>
+            <div class="card-body">
+                {% if latest_camels %}
+                <p><strong>Period:</strong> {{ latest_camels.rating_period }}</p>
+                <p><strong>Composite Rating:</strong> <span class="badge rating-{{ latest_camels.composite_rating }} fs-5">{{ latest_camels.composite_rating }}</span></p>
+                <p><strong>Risk Level:</strong> <span class="badge bg-{{ 'danger' if latest_camels.composite_rating >= 4 else 'warning' if latest_camels.composite_rating == 3 else 'success' }}">{{ latest_camels.risk_level }}</span></p>
+                <a href="/camels/{{ latest_camels.id }}" class="btn btn-sm btn-primary">View Full Rating</a>
+                {% else %}
+                <p class="text-muted">No CAMELS rating available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Latest Risk Assessment</h5>
+            </div>
+            <div class="card-body">
+                {% if latest_risk %}
+                <p><strong>Period:</strong> {{ latest_risk.assessment_period }}</p>
+                <p><strong>Risk Category:</strong> {{ latest_risk.risk_category }}</p>
+                <p><strong>Alert Level:</strong> <span class="badge alert-{{ latest_risk.alert_level.lower() }}">{{ latest_risk.alert_level }}</span></p>
+                <a href="/risk/{{ latest_risk.id }}" class="btn btn-sm btn-primary">View Full Assessment</a>
+                {% else %}
+                <p class="text-muted">No risk assessment available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Returns</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Period</th>
+                                <th>Type</th>
+                                <th>Submission Date</th>
+                                <th>Total Deposits</th>
+                                <th>Accounts</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ret in recent_returns %}
+                            <tr>
+                                <td>{{ ret.return_period }}</td>
+                                <td>{{ ret.return_type }}</td>
+                                <td>{{ ret.submission_date.strftime('%Y-%m-%d') if ret.submission_date else 'N/A' }}</td>
+                                <td>${{ "{:,.2f}".format(ret.total_deposits) if ret.total_deposits else '0.00' }}</td>
+                                <td>{{ "{:,}".format(ret.total_accounts) if ret.total_accounts else '0' }}</td>
+                                <td><span class="badge bg-{{ 'success' if ret.status == 'Validated' else 'warning' }}">{{ ret.status }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

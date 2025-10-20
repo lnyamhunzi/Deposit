@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Invoices{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Invoices</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card">
+        <div class="card-header">
+            Existing Invoices
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Invoice Number</th>
+                        <th>Institution</th>
+                        <th>Amount</th>
+                        <th>Total Amount</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invoice in invoices %}
+                    <tr>
+                        <td>{{ invoice.id }}</td>
+                        <td>{{ invoice.invoice_number }}</td>
+                        <td>{{ invoice.institution.name }}</td>
+                        <td>${{ "%.2f"|format(invoice.amount) }}</td>
+                        <td>${{ "%.2f"|format(invoice.total_amount) }}</td>
+                        <td>{{ invoice.due_date.strftime('%Y-%m-%d') }}</td>
+                        <td><span class="badge bg-{{ 'success' if invoice.status == 'PAID' else 'warning' if invoice.status == 'INVOICED' else 'danger' }}">{{ invoice.status }}</span></td>
+                        <td>
+                            <a href="{{ url_for('invoice_detail', invoice_id=invoice.id) }}" class="btn btn-sm btn-info">View Details</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

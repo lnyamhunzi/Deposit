@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Institutions{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Institutions</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Create New Institution
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('institutions_list_create') }}" method="POST">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Institution Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="code" class="form-label">Institution Code</label>
+                    <input type="text" class="form-control" id="code" name="code" required>
+                </div>
+                <div class="mb-3">
+                    <label for="contact_email" class="form-label">Contact Email</label>
+                    <input type="email" class="form-control" id="contact_email" name="contact_email" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Create Institution</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            Existing Institutions
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Code</th>
+                        <th>Contact Email</th>
+                        <th>Status</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for institution in institutions %}
+                    <tr>
+                        <td>{{ institution.id }}</td>
+                        <td>{{ institution.name }}</td>
+                        <td>{{ institution.code }}</td>
+                        <td>{{ institution.contact_email }}</td>
+                        <td><span class="badge bg-info">{{ institution.status }}</span></td>
+                        <td>{{ institution.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>
+                            <a href="{{ url_for('institution_detail_update_delete', institution_id=institution.id) }}" class="btn btn-sm btn-info">View/Edit</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

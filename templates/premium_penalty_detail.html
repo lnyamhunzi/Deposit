@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Premium Penalty Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Premium Penalty Details (ID: {{ penalty.id }})</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Penalty Information
+        </div>
+        <div class="card-body">
+            <p><strong>Invoice:</strong> {{ penalty.invoice.invoice_number }}</p>
+            <p><strong>Institution:</strong> {{ penalty.institution.name }} ({{ penalty.institution.code }})</p>
+            <p><strong>Penalty Type:</strong> {{ penalty.penalty_type }}</p>
+            <p><strong>Original Amount:</strong> ${{ "%.2f"|format(penalty.original_amount) }}</p>
+            <p><strong>Penalty Amount:</strong> ${{ "%.2f"|format(penalty.penalty_amount) }}</p>
+            <p><strong>Total Amount:</strong> ${{ "%.2f"|format(penalty.total_amount) }}</p>
+            <p><strong>Days Overdue:</strong> {{ penalty.days_overdue if penalty.days_overdue else 'N/A' }}</p>
+            <p><strong>Underpayment Amount:</strong> ${{ "%.2f"|format(penalty.underpayment_amount) if penalty.underpayment_amount else 'N/A' }}</p>
+            <p><strong>Penalty Rate:</strong> {{ "%.4f"|format(penalty.penalty_rate) }}</p>
+            <p><strong>Due Date:</strong> {{ penalty.due_date.strftime('%Y-%m-%d') }}</p>
+            <p><strong>Paid At:</strong> {{ penalty.paid_at.strftime('%Y-%m-%d %H:%M:%S') if penalty.paid_at else 'N/A' }}</p>
+            <p><strong>Status:</strong> <span class="badge bg-info">{{ penalty.status }}</span></p>
+            <p><strong>Created At:</strong> {{ penalty.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        </div>
+    </div>
+
+    <a href="{{ url_for('premium_penalties_list') }}" class="btn btn-secondary">Back to Premium Penalties</a>
+</div>
+{% endblock %}

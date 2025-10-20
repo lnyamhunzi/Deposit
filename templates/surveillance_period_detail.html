@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Surveillance Period Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Surveillance Period Details (ID: {{ period.id }})</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Period Information
+        </div>
+        <div class="card-body">
+            <p><strong>Institution:</strong> {{ period.institution.name }} ({{ period.institution.code }})</p>
+            <p><strong>Period Type:</strong> {{ period.period_type }}</p>
+            <p><strong>Start Date:</strong> {{ period.period_start.strftime('%Y-%m-%d') }}</p>
+            <p><strong>End Date:</strong> {{ period.period_end.strftime('%Y-%m-%d') }}</p>
+            <p><strong>Analysis Date:</strong> {{ period.analysis_date.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <a href="{{ url_for('surveillance_periods_list_create') }}" class="btn btn-secondary">Back to Surveillance Periods</a>
+        <a href="{{ url_for('deposit_analyses_list_create', period_id=period.id) }}" class="btn btn-primary">Manage Deposit Analyses</a>
+        <a href="{{ url_for('surveillance_exposure_calculations_list_create', period_id=period.id) }}" class="btn btn-primary">Manage Exposure Calculations</a>
+        <a href="{{ url_for('surveillance_camels_ratings_list_create', period_id=period.id) }}" class="btn btn-primary">Manage CAMELS Ratings</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Payment Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Payment Details (ID: {{ payment.id }})</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Payment Information
+        </div>
+        <div class="card-body">
+            <p><strong>Invoice:</strong> {{ payment.invoice.invoice_number }}</p>
+            <p><strong>Institution:</strong> {{ payment.institution.name }} ({{ payment.institution.code }})</p>
+            <p><strong>Amount:</strong> ${{ "%.2f"|format(payment.amount) }}</p>
+            <p><strong>Payment Date:</strong> {{ payment.payment_date.strftime('%Y-%m-%d') }}</p>
+            <p><strong>Payment Method:</strong> {{ payment.payment_method }}</p>
+            <p><strong>Payment Reference:</strong> {{ payment.payment_reference }}</p>
+            <p><strong>Bank Reference:</strong> {{ payment.bank_reference if payment.bank_reference else 'N/A' }}</p>
+            <p><strong>Proof Verified:</strong> {{ "Yes" if payment.proof_verified else "No" }}</p>
+            <p><strong>Status:</strong> <span class="badge bg-{{ 'success' if payment.status == 'VERIFIED' else 'warning' if payment.status == 'PENDING' else 'danger' }}">{{ payment.status }}</span></p>
+            <p><strong>Verified By:</strong> {{ payment.verified_by if payment.verified_by else 'N/A' }}</p>
+            <p><strong>Verified At:</strong> {{ payment.verified_at.strftime('%Y-%m-%d %H:%M:%S') if payment.verified_at else 'N/A' }}</p>
+            <p><strong>Rejection Reason:</strong> {{ payment.rejection_reason if payment.rejection_reason else 'N/A' }}</p>
+            <p><strong>Created At:</strong> {{ payment.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        </div>
+    </div>
+
+    <a href="{{ url_for('payments_list_create') }}" class="btn btn-secondary">Back to Payments</a>
+</div>
+{% endblock %}

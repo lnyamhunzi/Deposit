@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Surveillance Exposure Calculations{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Surveillance Exposure Calculations for Period ID: {{ period_id }}</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Create New Exposure Calculation
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('surveillance_exposure_calculations_list_create', period_id=period_id) }}" method="POST">
+                <div class="mb-3">
+                    <label for="deposit_type" class="form-label">Deposit Type</label>
+                    <select class="form-control" id="deposit_type" name="deposit_type" required>
+                        {% for type_enum in DepositType %}
+                            <option value="{{ type_enum.value }}">{{ type_enum.value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="total_deposits" class="form-label">Total Deposits</label>
+                    <input type="number" step="0.01" class="form-control" id="total_deposits" name="total_deposits" required>
+                </div>
+                <div class="mb-3">
+                    <label for="insured_amount" class="form-label">Insured Amount</label>
+                    <input type="number" step="0.01" class="form-control" id="insured_amount" name="insured_amount" required>
+                </div>
+                <div class="mb-3">
+                    <label for="uninsured_amount" class="form-label">Uninsured Amount</label>
+                    <input type="number" step="0.01" class="form-control" id="uninsured_amount" name="uninsured_amount" required>
+                </div>
+                <div class="mb-3">
+                    <label for="cover_level" class="form-label">Cover Level (%)</label>
+                    <input type="number" step="0.01" class="form-control" id="cover_level" name="cover_level" required>
+                </div>
+                <div class="mb-3">
+                    <label for="exposure_percentage" class="form-label">Exposure Percentage (%)</label>
+                    <input type="number" step="0.01" class="form-control" id="exposure_percentage" name="exposure_percentage" value="0.0">
+                </div>
+                <div class="mb-3">
+                    <label for="concentration_risk" class="form-label">Concentration Risk</label>
+                    <input type="number" step="0.0001" class="form-control" id="concentration_risk" name="concentration_risk" value="0.0">
+                </div>
+                <div class="mb-3">
+                    <label for="volatility_risk" class="form-label">Volatility Risk</label>
+                    <input type="number" step="0.0001" class="form-control" id="volatility_risk" name="volatility_risk" value="0.0">
+                </div>
+                <button type="submit" class="btn btn-primary">Create Calculation</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            Existing Exposure Calculations
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Total Deposits</th>
+                        <th>Insured</th>
+                        <th>Uninsured</th>
+                        <th>Cover Level</th>
+                        <th>Concentration Risk</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for calc in calculations %}
+                    <tr>
+                        <td>{{ calc.id }}</td>
+                        <td>{{ calc.deposit_type }}</td>
+                        <td>${{ "%.2f"|format(calc.total_deposits) }}</td>
+                        <td>${{ "%.2f"|format(calc.insured_amount) }}</td>
+                        <td>${{ "%.2f"|format(calc.uninsured_amount) }}</td>
+                        <td>{{ "%.2f"|format(calc.cover_level) }}%</td>
+                        <td>{{ "%.4f"|format(calc.concentration_risk) }}</td>
+                        <td>{{ calc.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>
+                            <a href="{{ url_for('surveillance_exposure_calculation_detail', calc_id=calc.id) }}" class="btn btn-sm btn-info">View Details</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Bank Surveillance - Q-Sight{% endblock %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3"><i class="fas fa-eye me-2"></i>Bank Surveillance</h2>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0">Run New Classification</h5></div>
+            <div class="card-body">
+                <form action="{{ url_for('run_classification') }}" method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="bank_id" class="form-label">Bank</label>
+                            <select name="bank_id" id="bank_id" class="form-select" required>
+                                <option value="">-- Select Bank --</option>
+                                {% for bank in banks %}
+                                <option value="{{ bank.id }}">{{ bank.bank_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="period" class="form-label">Period</label>
+                            <input type="text" name="period" id="period" class="form-control" placeholder="YYYY-MM" required>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">Run</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0">Deposits by Customer Type</h5></div>
+            <div class="card-body">
+                <div id="customer-type-chart"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0">Deposits by Account Type</h5></div>
+            <div class="card-body">
+                <div id="account-type-chart"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#surveillanceTable').DataTable({
+        pageLength: 10,
+        order: [[1, 'desc']]
+    });
+
+    var customerTypeData = [{
+        labels: {{ chart_data.customer_type.labels | tojson }},
+        values: {{ chart_data.customer_type.values | tojson }},
+        type: 'pie',
+        marker: {
+            colors: ['#3b82f6', '#1e3a5f']
+        }
+    }];
+
+    var customerTypeLayout = {
+        title: 'Deposits by Customer Type',
+        height: 400,
+        margin: { t: 40, b: 40, l: 40, r: 40 }
+    };
+
+    Plotly.newPlot('customer-type-chart', customerTypeData, customerTypeLayout);
+
+    var accountTypeData = [{
+        x: {{ chart_data.account_type.labels | tojson }},
+        y: {{ chart_data.account_type.values | tojson }},
+        type: 'bar',
+        marker: {
+            color: '#3b82f6'
+        }
+    }];
+
+    var accountTypeLayout = {
+        title: 'Deposits by Account Type',
+        height: 400,
+        margin: { t: 40, b: 40, l: 40, r: 40 },
+        xaxis: {
+            title: 'Account Type'
+        },
+        yaxis: {
+            title: 'Total Deposits'
+        }
+    };
+
+    Plotly.newPlot('account-type-chart', accountTypeData, accountTypeLayout);
+});
+</script>
+{% endblock %}

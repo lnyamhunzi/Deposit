@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}CAMELS Ratings - Q-Sight{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3"><i class="fas fa-chart-bar me-2"></i>CAMELS Ratings</h2>
+        <p class="text-muted">Comprehensive Analysis: Capital Adequacy, Asset Quality, Management, Earnings, Liquidity, Sensitivity to Market Risk</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">CAMELS Ratings History</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="camelsTable">
+                        <thead>
+                            <tr>
+                                <th>Bank</th>
+                                <th>Period</th>
+                                <th>Capital</th>
+                                <th>Assets</th>
+                                <th>Management</th>
+                                <th>Earnings</th>
+                                <th>Liquidity</th>
+                                <th>Sensitivity</th>
+                                <th>Composite</th>
+                                <th>Risk Level</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rating in ratings %}
+                            <tr>
+                                <td><strong>{{ rating.bank.bank_name }}</strong></td>
+                                <td>{{ rating.rating_period }}</td>
+                                <td><span class="badge rating-{{ rating.capital_rating }}">{{ rating.capital_rating }}</span></td>
+                                <td><span class="badge rating-{{ rating.asset_quality_rating }}">{{ rating.asset_quality_rating }}</span></td>
+                                <td><span class="badge rating-{{ rating.management_rating }}">{{ rating.management_rating }}</span></td>
+                                <td><span class="badge rating-{{ rating.earnings_rating }}">{{ rating.earnings_rating }}</span></td>
+                                <td><span class="badge rating-{{ rating.liquidity_rating }}">{{ rating.liquidity_rating }}</span></td>
+                                <td><span class="badge rating-{{ rating.sensitivity_rating }}">{{ rating.sensitivity_rating }}</span></td>
+                                <td><span class="badge rating-{{ rating.composite_rating }} fs-6">{{ rating.composite_rating }}</span></td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if rating.risk_level == 'Low Risk' else 'warning' if rating.risk_level == 'Moderate Risk' else 'danger' }}">
+                                        {{ rating.risk_level }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="/camels/{{ rating.id }}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-eye"></i> Details
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="fw-bold">CAMELS Rating Scale</h6>
+                <ul class="list-unstyled">
+                    <li><span class="badge rating-1">1</span> - Strong performance, minimal supervisory concern</li>
+                    <li><span class="badge rating-2">2</span> - Fundamentally sound, satisfactory</li>
+                    <li><span class="badge rating-3">3</span> - Moderate concerns, some weaknesses</li>
+                    <li><span class="badge rating-4">4</span> - Deficient, serious weaknesses</li>
+                    <li><span class="badge rating-5">5</span> - Critically deficient, high failure risk</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="fw-bold">CAMELS Components</h6>
+                <ul class="list-unstyled">
+                    <li><strong>C</strong> - Capital Adequacy</li>
+                    <li><strong>A</strong> - Asset Quality</li>
+                    <li><strong>M</strong> - Management Quality</li>
+                    <li><strong>E</strong> - Earnings</li>
+                    <li><strong>L</strong> - Liquidity</li>
+                    <li><strong>S</strong> - Sensitivity to Market Risk</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#camelsTable').DataTable({
+        pageLength: 25,
+        order: [[0, 'asc'], [1, 'desc']]
+    });
+});
+</script>
+{% endblock %}

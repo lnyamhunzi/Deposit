@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}SCV Simulation Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">SCV Simulation Details (ID: {{ simulation.id }})</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Simulation Summary
+        </div>
+        <div class="card-body">
+            <p><strong>Institution ID:</strong> {{ simulation.institution_id }}</p>
+            <p><strong>Simulation Date:</strong> {{ simulation.simulation_date.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+            <p><strong>Simulation Type:</strong> {{ simulation.simulation_type }}</p>
+            <p><strong>Cover Level:</strong> ${{ "%.2f"|format(simulation.cover_level) }}</p>
+            <p><strong>Total Payout Amount:</strong> ${{ "%.2f"|format(simulation.total_payout_amount) }}</p>
+            <p><strong>Affected Customers:</strong> {{ simulation.affected_customers }}</p>
+            <p><strong>Affected Accounts:</strong> {{ simulation.affected_accounts }}</p>
+            <p><strong>Parameters:</strong> {{ simulation.parameters }}</p>
+        </div>
+    </div>
+
+    {% if simulation.payout_breakdown %}
+    <div class="card mb-4">
+        <div class="card-header">
+            Payout Breakdown
+        </div>
+        <div class="card-body">
+            <h5>By Customer Type:</h5>
+            <ul class="list-group mb-3">
+                {% for type, amount in simulation.payout_breakdown.by_customer_type.items() %}
+                    <li class="list-group-item">{{ type }}: ${{ "%.2f"|format(amount) }}</li>
+                {% endfor %}
+            </ul>
+
+            <h5>By Account Size:</h5>
+            <ul class="list-group mb-3">
+                {% for size, amount in simulation.payout_breakdown.by_account_size.items() %}
+                    <li class="list-group-item">{{ size }}: ${{ "%.2f"|format(amount) }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if simulation.customer_payouts %}
+    <div class="card mb-4">
+        <div class="card-header">
+            Customer Payout Details (Sample)
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Customer ID</th>
+                        <th>Customer Name</th>
+                        <th>Payout Amount</th>
+                        <th>Affected Accounts</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payout in simulation.customer_payouts[:10] %} {# Show first 10 for brevity #}
+                    <tr>
+                        <td>{{ payout.customer_id }}</td>
+                        <td>{{ payout.customer_name }}</td>
+                        <td>${{ "%.2f"|format(payout.payout_amount) }}</td>
+                        <td>{{ payout.affected_accounts }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <a href="{{ url_for('scv_list') }}" class="btn btn-secondary">Back to SCV List</a>
+</div>
+{% endblock %}

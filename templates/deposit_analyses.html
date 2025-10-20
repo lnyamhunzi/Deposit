@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Deposit Analyses{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Deposit Analyses for Period ID: {{ period_id }}</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Create New Deposit Analysis
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('deposit_analyses_list_create', period_id=period_id) }}" method="POST">
+                <div class="mb-3">
+                    <label for="deposit_type" class="form-label">Deposit Type</label>
+                    <select class="form-control" id="deposit_type" name="deposit_type" required>
+                        {% for type_enum in DepositType %}
+                            <option value="{{ type_enum.value }}">{{ type_enum.value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="total_deposits" class="form-label">Total Deposits</label>
+                    <input type="number" step="0.01" class="form-control" id="total_deposits" name="total_deposits" required>
+                </div>
+                <div class="mb-3">
+                    <label for="total_accounts" class="form-label">Total Accounts</label>
+                    <input type="number" class="form-control" id="total_accounts" name="total_accounts" required>
+                </div>
+                <div class="mb-3">
+                    <label for="average_balance" class="form-label">Average Balance</label>
+                    <input type="number" step="0.01" class="form-control" id="average_balance" name="average_balance" required>
+                </div>
+                <div class="mb-3">
+                    <label for="growth_rate" class="form-label">Growth Rate (%)</label>
+                    <input type="number" step="0.01" class="form-control" id="growth_rate" name="growth_rate" value="0.0">
+                </div>
+                <button type="submit" class="btn btn-primary">Create Analysis</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            Existing Deposit Analyses
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Total Deposits</th>
+                        <th>Total Accounts</th>
+                        <th>Avg Balance</th>
+                        <th>Growth Rate</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for analysis in analyses %}
+                    <tr>
+                        <td>{{ analysis.id }}</td>
+                        <td>{{ analysis.deposit_type }}</td>
+                        <td>${{ "%.2f"|format(analysis.total_deposits) }}</td>
+                        <td>{{ analysis.total_accounts }}</td>
+                        <td>${{ "%.2f"|format(analysis.average_balance) }}</td>
+                        <td>{{ "%.2f"|format(analysis.growth_rate) }}%</td>
+                        <td>{{ analysis.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>
+                            <a href="{{ url_for('deposit_analysis_detail', analysis_id=analysis.id) }}" class="btn btn-sm btn-info">View Details</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

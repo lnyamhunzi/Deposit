@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Risk Analysis - Q-Sight{% endblock %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3"><i class="fas fa-exclamation-triangle me-2"></i>Risk Analysis</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0">Risk Assessments</h5></div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="riskTable">
+                        <thead>
+                            <tr><th>Bank</th><th>Period</th><th>Overall Risk</th><th>Credit Risk</th><th>Market Risk</th><th>PD</th><th>ML Failure Prob</th><th>Alert Level</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for risk in risk_scores %}
+                            <tr>
+                                <td><strong>{{ risk.bank.bank_name }}</strong></td>
+                                <td>{{ risk.assessment_period }}</td>
+                                <td>{{ "%.2f"|format(risk.overall_risk_score) }}</td>
+                                <td>{{ "%.2f"|format(risk.credit_risk_score) }}</td>
+                                <td>{{ "%.2f"|format(risk.market_risk_score) }}</td>
+                                <td>{{ "%.4f"|format(risk.probability_of_default) }}%</td>
+                                <td>{{ "%.4f"|format(risk.ml_failure_probability) }}%</td>
+                                <td><span class="badge alert-{{ risk.alert_level.lower() }}">{{ risk.alert_level }}</span></td>
+                                <td><a href="/risk/{{ risk.id }}" class="btn btn-sm btn-primary"><i class="fas fa-eye"></i> View</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>$(document).ready(function() { $('#riskTable').DataTable({pageLength: 25}); });</script>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}CAMELS Rating Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">CAMELS Rating Details (ID: {{ rating.id }})</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Rating Information
+        </div>
+        <div class="card-body">
+            <p><strong>Period ID:</strong> {{ rating.period_id }}</p>
+            <p><strong>Rating Date:</strong> {{ rating.rating_date.strftime('%Y-%m-%d') }}</p>
+            <p><strong>Composite Rating:</strong> {{ "%.2f"|format(rating.composite_rating) }}</p>
+            <p><strong>Risk Grade:</strong> {{ rating.risk_grade }}</p>
+            <p><strong>Created At:</strong> {{ rating.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Component Ratings
+        </div>
+        <div class="card-body">
+            <p><strong>Capital Adequacy:</strong> {{ "%.2f"|format(rating.capital_adequacy) }}</p>
+            <p><strong>Asset Quality:</strong> {{ "%.2f"|format(rating.asset_quality) }}</p>
+            <p><strong>Management Quality:</strong> {{ "%.2f"|format(rating.management_quality) }}</p>
+            <p><strong>Earnings:</strong> {{ "%.2f"|format(rating.earnings) }}</p>
+            <p><strong>Liquidity:</strong> {{ "%.2f"|format(rating.liquidity) }}</p>
+            <p><strong>Sensitivity:</strong> {{ "%.2f"|format(rating.sensitivity) }}</p>
+        </div>
+    </div>
+
+    {% if rating.risk_indicators %}
+    <div class="card mb-4">
+        <div class="card-header">
+            Risk Indicators
+        </div>
+        <div class="card-body">
+            <pre>{{ rating.risk_indicators | tojson(indent=2) }}</pre>
+        </div>
+    </div>
+    {% endif %}
+
+    <a href="{{ url_for('surveillance_camels_ratings_list_create', period_id=rating.period_id) }}" class="btn btn-secondary">Back to CAMELS Ratings</a>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Calculate CAMELS - Q-Sight{% endblock %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3"><i class="fas fa-calculator me-2"></i>Calculate CAMELS Rating for {{ bank.bank_name }}</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0">Financial Data Input</h5></div>
+            <div class="card-body">
+                <form method="POST">
+                    <h6 class="fw-bold text-primary mt-3">Capital Data</h6>
+                    <div class="row">
+                        <div class="col-md-3 mb-3"><label class="form-label">Tier 1 Capital</label><input type="number" name="tier1_capital" step="0.01" class="form-control" value="8000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Tier 2 Capital</label><input type="number" name="tier2_capital" step="0.01" class="form-control" value="2000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Risk Weighted Assets</label><input type="number" name="risk_weighted_assets" step="0.01" class="form-control" value="70000000" required></div>
+                    </div>
+                    <h6 class="fw-bold text-primary mt-3">Asset Data</h6>
+                    <div class="row">
+                        <div class="col-md-3 mb-3"><label class="form-label">Total Assets</label><input type="number" name="total_assets" step="0.01" class="form-control" value="100000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Total Loans</label><input type="number" name="total_loans" step="0.01" class="form-control" value="60000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Gross NPA</label><input type="number" name="gross_npa" step="0.01" class="form-control" value="2000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Net NPA</label><input type="number" name="net_npa" step="0.01" class="form-control" value="1000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Provisions</label><input type="number" name="provisions" step="0.01" class="form-control" value="1000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Previous Year Assets</label><input type="number" name="previous_year_assets" step="0.01" class="form-control" value="90000000" required></div>
+                    </div>
+                    <h6 class="fw-bold text-primary mt-3">Earnings Data</h6>
+                    <div class="row">
+                        <div class="col-md-3 mb-3"><label class="form-label">Total Income</label><input type="number" name="total_income" step="0.01" class="form-control" value="10000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Operating Expenses</label><input type="number" name="operating_expenses" step="0.01" class="form-control" value="6000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Net Income</label><input type="number" name="net_income" step="0.01" class="form-control" value="1500000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Operating Income</label><input type="number" name="operating_income" step="0.01" class="form-control" value="4000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Interest Income</label><input type="number" name="interest_income" step="0.01" class="form-control" value="8000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Interest Expense</label><input type="number" name="interest_expense" step="0.01" class="form-control" value="4000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Earning Assets</label><input type="number" name="earning_assets" step="0.01" class="form-control" value="80000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Non-Interest Income</label><input type="number" name="non_interest_income" step="0.01" class="form-control" value="2000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Previous Net Income</label><input type="number" name="previous_net_income" step="0.01" class="form-control" value="1200000" required></div>
+                    </div>
+                    <h6 class="fw-bold text-primary mt-3">Liquidity Data</h6>
+                    <div class="row">
+                        <div class="col-md-3 mb-3"><label class="form-label">Liquid Assets</label><input type="number" name="liquid_assets" step="0.01" class="form-control" value="25000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Short-term Liabilities</label><input type="number" name="short_term_liabilities" step="0.01" class="form-control" value="20000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Total Deposits</label><input type="number" name="total_deposits" step="0.01" class="form-control" value="70000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Core Deposits</label><input type="number" name="core_deposits" step="0.01" class="form-control" value="50000000" required></div>
+                    </div>
+                    <h6 class="fw-bold text-primary mt-3">Market Sensitivity Data</h6>
+                    <div class="row">
+                        <div class="col-md-3 mb-3"><label class="form-label">Foreign Currency Assets</label><input type="number" name="foreign_currency_assets" step="0.01" class="form-control" value="10000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Foreign Currency Liabilities</label><input type="number" name="foreign_currency_liabilities" step="0.01" class="form-control" value="5000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Interest Sensitive Assets</label><input type="number" name="interest_sensitive_assets" step="0.01" class="form-control" value="40000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Interest Sensitive Liabilities</label><input type="number" name="interest_sensitive_liabilities" step="0.01" class="form-control" value="30000000" required></div>
+                        <div class="col-md-3 mb-3"><label class="form-label">Largest Depositor</label><input type="number" name="largest_depositor" step="0.01" class="form-control" value="5000000" required></div>
+                    </div>
+                    <h6 class="fw-bold text-primary mt-3">Management Quality</h6>
+                    <div class="row">
+                        <div class="col-md-3 mb-3"><label class="form-label">Total Employees</label><input type="number" name="total_employees" class="form-control" value="100" required></div>
+                    </div>
+                    <div class="d-grid"><button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-calculator me-2"></i>Calculate CAMELS Rating</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

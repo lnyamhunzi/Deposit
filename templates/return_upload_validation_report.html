@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Validation Report{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Validation Report for Upload ID: {{ report.validation_report.upload_details.id if report.validation_report else 'N/A' }}</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if report.validation_report %}
+    <div class="card mb-4">
+        <div class="card-header">
+            Upload Details
+        </div>
+        <div class="card-body">
+            <p><strong>File Name:</strong> {{ report.validation_report.upload_details.file_name }}</p>
+            <p><strong>File Type:</strong> {{ report.validation_report.upload_details.file_type }}</p>
+            <p><strong>Upload Date:</strong> {{ report.validation_report.upload_details.upload_date }}</p>
+            <p><strong>File Size:</strong> {{ (report.validation_report.upload_details.file_size / 1024 / 1024)|round(2) }} MB</p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Period Details
+        </div>
+        <div class="card-body">
+            <p><strong>Period Type:</strong> {{ report.validation_report.period_details.period_type }}</p>
+            <p><strong>Period Start:</strong> {{ report.validation_report.period_details.period_start }}</p>
+            <p><strong>Period End:</strong> {{ report.validation_report.period_details.period_end }}</p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Validation Summary
+        </div>
+        <div class="card-body">
+            <p><strong>Total Tests:</strong> {{ report.validation_report.validation_summary.total_tests }}</p>
+            <p><strong>Passed:</strong> <span class="badge bg-success">{{ report.validation_report.validation_summary.passed }}</span></p>
+            <p><strong>Failed:</strong> <span class="badge bg-danger">{{ report.validation_report.validation_summary.failed }}</span></p>
+            <p><strong>Warnings:</strong> <span class="badge bg-warning">{{ report.validation_report.validation_summary.warnings }}</span></p>
+            <p><strong>Data Quality Score:</strong> {{ report.validation_report.data_quality_score|round(2) }}</p>
+            <p><strong>Submission Readiness:</strong> <span class="badge bg-{{ 'success' if report.validation_report.submission_readiness else 'danger' }}">{{ "Ready" if report.validation_report.submission_readiness else "Not Ready" }}</span></p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Recommendations
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                {% for rec in report.validation_report.recommendations %}
+                    <li class="list-group-item">{{ rec }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">No validation report available for this upload.</div>
+    {% endif %}
+
+    <a href="{{ url_for('return_upload_details', upload_id=report.validation_report.upload_details.id if report.validation_report else '') }}" class="btn btn-secondary">Back to Upload Details</a>
+</div>
+{% endblock %}

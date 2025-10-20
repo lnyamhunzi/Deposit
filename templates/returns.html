@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Returns Management - Q-Sight{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-3"><i class="fas fa-file-upload me-2"></i>Returns Management</h2>
+        <a href="/returns/upload" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Upload New Return
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Returns History</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="returnsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Bank</th>
+                                <th>Period</th>
+                                <th>Type</th>
+                                <th>Submission Date</th>
+                                <th>Total Deposits</th>
+                                <th>Total Accounts</th>
+                                <th>Status</th>
+                                <th>Validation</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ret in returns %}
+                            <tr>
+                                <td>{{ ret.id }}</td>
+                                <td><strong>{{ ret.bank.bank_name }}</strong></td>
+                                <td>{{ ret.return_period }}</td>
+                                <td>{{ ret.return_type }}</td>
+                                <td>{{ ret.submission_date.strftime('%Y-%m-%d %H:%M') if ret.submission_date else 'N/A' }}</td>
+                                <td>${{ "{:,.2f}".format(ret.total_deposits) if ret.total_deposits else '0.00' }}</td>
+                                <td>{{ "{:,}".format(ret.total_accounts) if ret.total_accounts else '0' }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if ret.status == 'Validated' else 'warning' if ret.status == 'Pending' else 'secondary' }}">
+                                        {{ ret.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if ret.validation_status == 'validated' else 'danger' }}">
+                                        {{ ret.validation_status or 'N/A' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="/return/{{ ret.id }}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#returnsTable').DataTable({
+        pageLength: 25,
+        order: [[4, 'desc']]
+    });
+});
+</script>
+{% endblock %}
